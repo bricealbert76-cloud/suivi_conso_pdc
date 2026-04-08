@@ -1,5 +1,5 @@
 """
-Suivi Consommation DSI - v4.21
+Suivi Consommation DSI - v4.22
 IHM de traitement des fichiers de saisie et plans de charges
   - Suivi Conso : génère un CSV filtré depuis le fichier saisies (.txt)
   - Histo TJM   : calcule et exporte les TJM mensuels par intervenant (Histo_TJM.xlsx)
@@ -134,7 +134,7 @@ class SuiviConsoApp(tk.Tk):
 
     def __init__(self):
         super().__init__()
-        self.title("Suivi Consommation DSI — v4.21")
+        self.title("Suivi Consommation DSI — v4.22")
         self.configure(bg=BG_MAIN)
         self.resizable(True, True)
         self.minsize(920, 700)
@@ -172,7 +172,7 @@ class SuiviConsoApp(tk.Tk):
         hdr.pack(fill="x", padx=24)
         tk.Label(hdr, text="⬡  SUIVI CONSOMMATION DSI",
                  bg=BG_MAIN, fg=ACCENT, font=FONT_TITLE).pack(side="left")
-        tk.Label(hdr, text="v4.21", bg=BG_MAIN, fg=TEXT_SEC,
+        tk.Label(hdr, text="v4.22", bg=BG_MAIN, fg=TEXT_SEC,
                  font=FONT_SMALL).pack(side="left", padx=8, pady=4, anchor="s")
         tk.Frame(self, bg=BORDER, height=1).pack(fill="x")
 
@@ -2205,7 +2205,7 @@ class SuiviConsoApp(tk.Tk):
                 # ── Étape 7 : Chargement Histo_TJM.xlsx ─────────────────────
                 import os as _os2
                 path_histo = _os2.path.join(
-                    _os2.path.dirname(_os2.path.abspath(path1)),
+                    _os2.path.dirname(_os2.path.abspath(__file__)),
                     "Histo_TJM.xlsx")
                 histo_tjm = {}   # (u_norm, mois) → tjm
                 if HAS_OPENPYXL and _os2.path.isfile(path_histo):
