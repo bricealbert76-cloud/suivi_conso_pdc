@@ -3087,13 +3087,13 @@ class PdcMajWindow(tk.Toplevel):
             "Modifs_plan_de_charge.log")
 
         self._budgets, self._survcomm_projects, self._vacance_projects = self._load_budgets()
-        # Intervenants SurvComm : ceux dont tous les projets hors TopVacance sont SurvComm
+        # Intervenants SurvComm : ceux dont tous les projets hors TopAbsence sont SurvComm
         self._survcomm_intervenants = set()
         if self._survcomm_projects:
             for u_orig in (self._cache_usernames or []):
                 u_norm = _norm_name(u_orig)
                 projs  = set(self._cache_jh.get(u_norm, {}).keys())
-                # On exclut les projets TopVacance avant le test SurvComm
+                # On exclut les projets TopAbsence avant le test SurvComm
                 projs_hors_vacance = projs - self._vacance_projects
                 if projs_hors_vacance and projs_hors_vacance.issubset(self._survcomm_projects):
                     self._survcomm_intervenants.add(u_orig)
@@ -3103,7 +3103,7 @@ class PdcMajWindow(tk.Toplevel):
     def _load_budgets(self):
         """Charge Budgets_2026.csv (séparateur ';').
         Cherche dans : 1) répertoire courant  2) répertoire du script.
-        Retourne (dict {pc: budget}, set {pc SurvComm}, set {pc TopVacance}).
+        Retourne (dict {pc: budget}, set {pc SurvComm}, set {pc TopAbsence}).
         Logue les résultats dans le Journal de la fenêtre principale.
         """
         import os, csv
@@ -3147,9 +3147,11 @@ class PdcMajWindow(tk.Toplevel):
                 col_pc  = norm_fields.get("project_code", "Project Code")
                 col_bud = norm_fields.get("budget",       "Budget")
                 col_top = norm_fields.get("topsurvcomm",  "TopSurvComm")
-                # TopVacance : accepte "topvacance" ou "top_vacance"
-                col_vac = norm_fields.get("topvacance",
-                          norm_fields.get("top_vacance",  "TopVacance"))
+                # TopAbsence : accepte "topabsence", "top_absence", "topvacance", "top_vacance"
+                col_vac = norm_fields.get("topabsence",
+                          norm_fields.get("top_absence",
+                          norm_fields.get("topvacance",
+                          norm_fields.get("top_vacance",  "TopAbsence"))))
 
                 for row in reader:
                     pc  = str(row.get(col_pc,  "")).strip()
@@ -3164,7 +3166,7 @@ class PdcMajWindow(tk.Toplevel):
                         pass
                     if top:        # non vide → projet SurvComm
                         survcomm.add(pc)
-                    if vac == "1": # TopVacance=1 → absence/congé/maladie
+                    if vac == "1": # TopAbsence=1 → absence/congé/maladie
                         vacance.add(pc)
 
             log("━" * 54, "section")
@@ -3173,7 +3175,7 @@ class PdcMajWindow(tk.Toplevel):
                 f"{', '.join(raw_fields)}", "info")
             log(f"  Colonnes résolues : Project Code='{col_pc}' | "
                 f"Budget='{col_bud}' | TopSurvComm='{col_top}' | "
-                f"TopVacance='{col_vac}'", "info")
+                f"TopAbsence='{col_vac}'", "info")
             # Contenu complet du fichier
             with open(path, "r", encoding=enc, errors="replace", newline="") as f2:
                 raw_lines = [l.rstrip("\n\r") for l in f2.readlines()]
@@ -3182,9 +3184,9 @@ class PdcMajWindow(tk.Toplevel):
                 log(f"    {line}", "info")
             log(f"  {len(result)} projet(s) avec budget, "
                 f"{len(survcomm)} projet(s) SurvComm, "
-                f"{len(vacance)} projet(s) TopVacance.", "ok")
+                f"{len(vacance)} projet(s) TopAbsence.", "ok")
 
-            # Intervenants SurvComm : projets hors TopVacance tous dans SurvComm
+            # Intervenants SurvComm : projets hors TopAbsence tous dans SurvComm
             survcomm_users = []
             for u_orig in (self._cache_usernames or []):
                 u_norm = _norm_name(u_orig)
