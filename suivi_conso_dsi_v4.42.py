@@ -2148,6 +2148,19 @@ class SuiviConsoApp(tk.Tk):
                 if yc_eur:
                     df_eur = df_eur[df_eur[yc_eur].astype(str).str.strip() == str(annee)]
 
+                # ── Étape 2b : Ajout intervenants PDC ciblés (TARGET_PROJECTS, hors RGU) ──
+                extra_count = 0
+                if ic_jh and pc_jh:
+                    for _, row in df_jh.iterrows():
+                        if str(row.get(pc_jh, "")).strip() not in TARGET_PROJECTS:
+                            continue
+                        interv_raw  = str(row.get(ic_jh, "")).strip()
+                        interv_norm = _norm_name(interv_raw)
+                        if interv_norm and interv_norm not in rgu_users:
+                            rgu_users[interv_norm] = interv_raw
+                            extra_count += 1
+                usernames_list = sorted(rgu_users.values())
+
                 # ── Étape 3 : Dict JH (username_norm → {prj → {mois → jh}}) ──
                 jh_data  = {}   # username_norm → {prj_code → {mois → jh, "_lib" → str}}
                 for _, row in df_jh.iterrows():
@@ -2322,7 +2335,9 @@ class SuiviConsoApp(tk.Tk):
                     self.histo_tjm_data  = histo_tjm
                     self._pdc_cache_ready = True
                     self._log(
-                        f"  ✔  Cache PDC prêt : {len(usernames_list)} username(s) RGU, "
+                        f"  ✔  Cache PDC prêt : {len(usernames_list)} username(s) "
+                        f"({len(usernames_list) - extra_count} RGU"
+                        f"{f' + {extra_count} PDC ciblés' if extra_count else ''}), "
                         f"{len(projets_rgu)} projet(s), "
                         f"{len(diana_jh)} username(s) Diana chargés, "
                         f"Histo_TJM : {len(histo_tjm)} entrée(s).", "ok")
