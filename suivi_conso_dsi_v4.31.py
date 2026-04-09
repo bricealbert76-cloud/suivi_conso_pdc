@@ -1,9 +1,11 @@
 """
-Suivi Consommation DSI - v4.3
+Suivi Consommation DSI - v4.31
 IHM de traitement des fichiers de saisie et plans de charges
   - Suivi Conso : génère un CSV filtré depuis le fichier saisies (.txt)
   - Histo TJM   : calcule et exporte les TJM mensuels par intervenant (Histo_TJM.xlsx)
 """
+
+VERSION = "4.31"
 
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, scrolledtext
@@ -107,6 +109,56 @@ FONT_SMALL = ("Consolas", 9)
 FONT_MONO  = ("Courier New", 9)
 
 
+def _calc_jours_ouvres(annee):
+    """Calcule les jours ouvrés par mois pour l'année donnée (France métropolitaine).
+    Utilise uniquement la bibliothèque standard Python (pas de dépendance externe).
+    Retourne une liste de 12 entiers (janvier → décembre).
+    """
+    import calendar
+    from datetime import date, timedelta
+
+    # Calcul de Pâques — algorithme grégorien anonyme
+    a = annee % 19
+    b = annee // 100
+    c = annee % 100
+    d = b // 4
+    e = b % 4
+    f = (b + 8) // 25
+    g = (b - f + 1) // 3
+    h = (19 * a + b - d - g + 15) % 30
+    i = c // 4
+    k = c % 4
+    l = (32 + 2 * e + 2 * i - h - k) % 7
+    m = (a + 11 * h + 22 * l) // 451
+    mois_p = (h + l - 7 * m + 114) // 31
+    jour_p = ((h + l - 7 * m + 114) % 31) + 1
+    paques = date(annee, mois_p, jour_p)
+
+    feries = {
+        date(annee, 1,  1),               # Jour de l'an
+        paques + timedelta(days=1),        # Lundi de Pâques
+        date(annee, 5,  1),               # Fête du travail
+        date(annee, 5,  8),               # Victoire 1945
+        paques + timedelta(days=39),       # Ascension
+        paques + timedelta(days=50),       # Lundi de Pentecôte
+        date(annee, 7,  14),              # Fête nationale
+        date(annee, 8,  15),              # Assomption
+        date(annee, 11, 1),               # Toussaint
+        date(annee, 11, 11),              # Armistice
+        date(annee, 12, 25),              # Noël
+    }
+
+    result = []
+    for mois in range(1, 13):
+        nb = sum(
+            1 for jour in range(1, calendar.monthrange(annee, mois)[1] + 1)
+            if date(annee, mois, jour).weekday() < 5        # lundi–vendredi
+            and date(annee, mois, jour) not in feries
+        )
+        result.append(nb)
+    return result
+
+
 def _norm_name(s):
     """Normalise un nom pour la jointure : supprime les accents, met en majuscules,
     remplace tirets et toutes variantes d'apostrophes par des espaces."""
@@ -159,7 +211,7 @@ class SuiviConsoApp(tk.Tk):
 
     def __init__(self):
         super().__init__()
-        self.title("Suivi Consommation DSI — v4.3")
+        self.title(f"Suivi Consommation DSI — v{VERSION}")
         self.configure(bg=BG_MAIN)
         self.resizable(True, True)
         self.minsize(920, 700)
@@ -197,7 +249,7 @@ class SuiviConsoApp(tk.Tk):
         hdr.pack(fill="x", padx=24)
         tk.Label(hdr, text="⬡  SUIVI CONSOMMATION DSI",
                  bg=BG_MAIN, fg=ACCENT, font=FONT_TITLE).pack(side="left")
-        tk.Label(hdr, text="v4.3", bg=BG_MAIN, fg=TEXT_SEC,
+        tk.Label(hdr, text=f"v{VERSION}", bg=BG_MAIN, fg=TEXT_SEC,
                  font=FONT_SMALL).pack(side="left", padx=8, pady=4, anchor="s")
         tk.Frame(self, bg=BORDER, height=1).pack(fill="x")
 
@@ -3272,7 +3324,7 @@ class PdcMajWindow(tk.Toplevel):
         C_ALT    = "#1a2530"
         C_OVER   = "#f0883e"    # dépassement jours ouvrés
 
-        JOURS_OUVRES = [21, 20, 21, 22, 21, 21, 23, 21, 22, 23, 21, 21]
+        JOURS_OUVRES = _calc_jours_ouvres(self._annee)
 
         # En-têtes colonnes
         tk.Label(self._frame_jh, text="Project Code", bg=C_HDR, fg=ACCENT2,
