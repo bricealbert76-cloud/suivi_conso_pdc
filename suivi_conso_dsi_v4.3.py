@@ -1,5 +1,5 @@
 """
-Suivi Consommation DSI - v4.22
+Suivi Consommation DSI - v4.3
 IHM de traitement des fichiers de saisie et plans de charges
   - Suivi Conso : génère un CSV filtré depuis le fichier saisies (.txt)
   - Histo TJM   : calcule et exporte les TJM mensuels par intervenant (Histo_TJM.xlsx)
@@ -58,22 +58,47 @@ MOIS_LABELS = [
 
 
 # ─────────────────────────────────────────────
-#  THÈME
+#  THÈMES  (sélection via --style dark|light|blue)
 # ─────────────────────────────────────────────
-BG_MAIN   = "#0d1117"
-BG_PANEL  = "#161b22"
-BG_CARD   = "#1c2128"
-BG_ENTRY  = "#21262d"
-ACCENT    = "#2ea043"
-ACCENT2   = "#388bfd"
-WARN      = "#f0883e"
-TEXT_PRI  = "#e6edf3"
-TEXT_SEC  = "#8b949e"
-BORDER    = "#30363d"
-BTN_ACT   = "#238636"
-BTN_ACT_H = "#2ea043"
-BTN_NEU   = "#21262d"
-BTN_NEU_H = "#30363d"
+THEMES = {
+    "dark": {
+        "BG_MAIN"  : "#0d1117", "BG_PANEL" : "#161b22",
+        "BG_CARD"  : "#1c2128", "BG_ENTRY" : "#21262d",
+        "ACCENT"   : "#2ea043", "ACCENT2"  : "#388bfd",
+        "WARN"     : "#f0883e", "TEXT_PRI" : "#e6edf3",
+        "TEXT_SEC" : "#8b949e", "BORDER"   : "#30363d",
+        "BTN_ACT"  : "#238636", "BTN_ACT_H": "#2ea043",
+        "BTN_NEU"  : "#21262d", "BTN_NEU_H": "#30363d",
+    },
+    "light": {
+        "BG_MAIN"  : "#f6f8fa", "BG_PANEL" : "#ffffff",
+        "BG_CARD"  : "#eaeef2", "BG_ENTRY" : "#ffffff",
+        "ACCENT"   : "#1a7f37", "ACCENT2"  : "#0969da",
+        "WARN"     : "#bc4c00", "TEXT_PRI" : "#1f2328",
+        "TEXT_SEC" : "#656d76", "BORDER"   : "#d0d7de",
+        "BTN_ACT"  : "#1a7f37", "BTN_ACT_H": "#2ea043",
+        "BTN_NEU"  : "#eaeef2", "BTN_NEU_H": "#d0d7de",
+    },
+    "blue": {
+        "BG_MAIN"  : "#0f1923", "BG_PANEL" : "#162032",
+        "BG_CARD"  : "#1c2d42", "BG_ENTRY" : "#1e3a5f",
+        "ACCENT"   : "#00b4d8", "ACCENT2"  : "#48cae4",
+        "WARN"     : "#f77f00", "TEXT_PRI" : "#e0f2fe",
+        "TEXT_SEC" : "#90c4e4", "BORDER"   : "#2a4a6b",
+        "BTN_ACT"  : "#0077b6", "BTN_ACT_H": "#00b4d8",
+        "BTN_NEU"  : "#1e3a5f", "BTN_NEU_H": "#2a4a6b",
+    },
+}
+
+def _apply_theme(name):
+    theme = THEMES.get(name, THEMES["dark"])
+    globals().update(theme)
+
+import argparse as _argparse
+_parser = _argparse.ArgumentParser(add_help=False)
+_parser.add_argument("--style", choices=["dark", "light", "blue"], default="dark")
+_args, _ = _parser.parse_known_args()
+_apply_theme(_args.style)
 
 FONT_TITLE = ("Consolas", 18, "bold")
 FONT_HEAD  = ("Consolas", 11, "bold")
@@ -134,7 +159,7 @@ class SuiviConsoApp(tk.Tk):
 
     def __init__(self):
         super().__init__()
-        self.title("Suivi Consommation DSI — v4.22")
+        self.title("Suivi Consommation DSI — v4.3")
         self.configure(bg=BG_MAIN)
         self.resizable(True, True)
         self.minsize(920, 700)
@@ -172,7 +197,7 @@ class SuiviConsoApp(tk.Tk):
         hdr.pack(fill="x", padx=24)
         tk.Label(hdr, text="⬡  SUIVI CONSOMMATION DSI",
                  bg=BG_MAIN, fg=ACCENT, font=FONT_TITLE).pack(side="left")
-        tk.Label(hdr, text="v4.22", bg=BG_MAIN, fg=TEXT_SEC,
+        tk.Label(hdr, text="v4.3", bg=BG_MAIN, fg=TEXT_SEC,
                  font=FONT_SMALL).pack(side="left", padx=8, pady=4, anchor="s")
         tk.Frame(self, bg=BORDER, height=1).pack(fill="x")
 
