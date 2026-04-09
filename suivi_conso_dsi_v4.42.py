@@ -1,5 +1,5 @@
 """
-Suivi Consommation DSI - v4.41
+Suivi Consommation DSI - v4.42
 IHM de traitement des fichiers de saisie et plans de charges
   - Suivi Conso : génère un CSV filtré depuis le fichier saisies (.txt)
   - Histo TJM   : calcule et exporte les TJM mensuels par intervenant (Histo_TJM.xlsx)
@@ -3086,14 +3086,16 @@ class PdcMajWindow(tk.Toplevel):
             _os.path.dirname(_os.path.abspath(path_jh)),
             "Modifs_plan_de_charge.log")
 
-        self._budgets, self._survcomm_projects = self._load_budgets()
-        # Intervenants travaillant uniquement sur le périmètre SurvComm
+        self._budgets, self._survcomm_projects, self._vacance_projects = self._load_budgets()
+        # Intervenants SurvComm : ceux dont tous les projets hors TopVacance sont SurvComm
         self._survcomm_intervenants = set()
         if self._survcomm_projects:
             for u_orig in (self._cache_usernames or []):
                 u_norm = _norm_name(u_orig)
                 projs  = set(self._cache_jh.get(u_norm, {}).keys())
-                if projs and projs.issubset(self._survcomm_projects):
+                # On exclut les projets TopVacance avant le test SurvComm
+                projs_hors_vacance = projs - self._vacance_projects
+                if projs_hors_vacance and projs_hors_vacance.issubset(self._survcomm_projects):
                     self._survcomm_intervenants.add(u_orig)
         self._build_ui()
         self.after(100, self._load_data)
@@ -3101,13 +3103,12 @@ class PdcMajWindow(tk.Toplevel):
     def _load_budgets(self):
         """Charge Budgets_2026.csv (séparateur ';').
         Cherche dans : 1) répertoire courant  2) répertoire du script.
-        Retourne (dict {project_code: budget_float}, set {project_code SurvComm}).
+        Retourne (dict {pc: budget}, set {pc SurvComm}, set {pc TopVacance}).
         Logue les résultats dans le Journal de la fenêtre principale.
         """
         import os, csv
         log = self.master._log   # Journal de SuiviConsoApp
 
-        # Recherche du fichier dans le répertoire courant, puis dans le répertoire du script
         script_dir = os.path.dirname(os.path.abspath(__file__))
         candidates = [
             os.path.join(os.getcwd(), "Budgets_2026.csv"),
@@ -3117,12 +3118,13 @@ class PdcMajWindow(tk.Toplevel):
 
         result   = {}
         survcomm = set()
+        vacance  = set()
 
         if path is None:
             log("  ⚠  Budgets_2026.csv introuvable. Chemins recherchés :", "warn")
             for p in candidates:
                 log(f"      • {p}", "warn")
-            return result, survcomm
+            return result, survcomm, vacance
 
         enc = "utf-8-sig"
         for c in ("utf-8-sig", "utf-8", "windows-1252", "latin-1"):
@@ -3137,41 +3139,44 @@ class PdcMajWindow(tk.Toplevel):
             with open(path, "r", encoding=enc, errors="replace", newline="") as f:
                 reader = csv.DictReader(f, delimiter=";")
                 # Normalisation des noms de colonnes (insensible à la casse/espaces)
-                if reader.fieldnames:
-                    norm_fields = {
-                        fn.strip().lower().replace(" ", "_"): fn
-                        for fn in reader.fieldnames
-                    }
-                else:
-                    norm_fields = {}
-                col_pc  = norm_fields.get("project_code",  "Project Code")
-                col_bud = norm_fields.get("budget",        "Budget")
-                col_top = norm_fields.get("topsurvcomm",   "TopSurvComm")
+                norm_fields = {
+                    fn.strip().lower().replace(" ", "_"): fn
+                    for fn in (reader.fieldnames or [])
+                }
+                col_pc  = norm_fields.get("project_code", "Project Code")
+                col_bud = norm_fields.get("budget",       "Budget")
+                col_top = norm_fields.get("topsurvcomm",  "TopSurvComm")
+                col_vac = norm_fields.get("topvacance",   "TopVacance")
 
                 for row in reader:
                     pc  = str(row.get(col_pc,  "")).strip()
                     raw = str(row.get(col_bud, "")).strip().replace(",", ".")
                     top = str(row.get(col_top, "")).strip()
+                    vac = str(row.get(col_vac, "")).strip()
                     if not pc:
                         continue
                     try:
                         result[pc] = float(raw)
                     except ValueError:
                         pass
-                    if top:   # valeur non vide → projet SurvComm
+                    if top:          # non vide → projet SurvComm
                         survcomm.add(pc)
+                    if vac == "1":   # TopVacance=1 → absence/congé/maladie
+                        vacance.add(pc)
 
             log("━" * 54, "section")
             log(f"  Budgets_2026.csv chargé depuis {path}", "ok")
             log(f"  {len(result)} projet(s) avec budget, "
-                f"{len(survcomm)} projet(s) SurvComm.", "ok")
+                f"{len(survcomm)} projet(s) SurvComm, "
+                f"{len(vacance)} projet(s) TopVacance.", "ok")
 
-            # Intervenants SurvComm uniquement (calculés après le chargement du cache)
+            # Intervenants SurvComm : projets hors TopVacance tous dans SurvComm
             survcomm_users = []
             for u_orig in (self._cache_usernames or []):
                 u_norm = _norm_name(u_orig)
                 projs  = set(self._cache_jh.get(u_norm, {}).keys())
-                if projs and projs.issubset(survcomm):
+                projs_hors_vacance = projs - vacance
+                if projs_hors_vacance and projs_hors_vacance.issubset(survcomm):
                     survcomm_users.append(u_orig)
             if survcomm_users:
                 log(f"  Intervenant(s) exclusivement SurvComm "
@@ -3184,7 +3189,7 @@ class PdcMajWindow(tk.Toplevel):
         except Exception as e:
             log(f"  ✘  Erreur lecture Budgets_2026.csv : {e}", "error")
 
-        return result, survcomm
+        return result, survcomm, vacance
 
     # ── Chargement données ───────────────────────────────────────────────
     def _load_data(self):
