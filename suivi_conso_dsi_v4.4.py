@@ -3317,16 +3317,20 @@ class PdcMajWindow(tk.Toplevel):
         mois_futurs   = list(range(self._mois_cur, 13))
         interv_actuel = self._interv_var.get()
 
-        # Calcul des écarts pour tous les intervenants
+        # Calcul des écarts — mois pas encore écoulés uniquement
         ecarts = []   # [(u_orig, ecart_total)]
         for u_orig in (self._cache_usernames or []):
             data = self._get_jh_data(u_orig)
-            ecart_total = 0.0
-            for m in mois_futurs:
+            ecart_total   = 0.0
+            has_ecart_fut = False
+            for m in mois_futurs:          # jamais de mois passés ici
                 jh_m = sum(v for prj_data in data.values()
                            for k, v in prj_data.items() if k == m)
-                ecart_total += jh_m - JOURS_OUVRES[m - 1]
-            if abs(ecart_total) > 0.01:
+                e = jh_m - JOURS_OUVRES[m - 1]
+                ecart_total += e
+                if abs(e) > 0.01:
+                    has_ecart_fut = True   # au moins un mois futur en écart
+            if has_ecart_fut:
                 ecarts.append((u_orig, ecart_total))
 
         # Titre
