@@ -3086,8 +3086,43 @@ class PdcMajWindow(tk.Toplevel):
             _os.path.dirname(_os.path.abspath(path_jh)),
             "Modifs_plan_de_charge.log")
 
+        self._budgets = self._load_budgets()
         self._build_ui()
         self.after(100, self._load_data)
+
+    def _load_budgets(self):
+        """Charge Budgets_2026.csv depuis le répertoire courant.
+        Retourne dict {project_code: budget_float}.
+        """
+        import os, csv
+        path = os.path.join(os.getcwd(), "Budgets_2026.csv")
+        result = {}
+        if not os.path.isfile(path):
+            return result
+        enc = "utf-8-sig"
+        for c in ("utf-8-sig", "utf-8", "windows-1252", "latin-1"):
+            try:
+                with open(path, "r", encoding=c) as f:
+                    f.read(1024)
+                enc = c
+                break
+            except (UnicodeDecodeError, LookupError):
+                continue
+        try:
+            with open(path, "r", encoding=enc, errors="replace", newline="") as f:
+                reader = csv.DictReader(f, delimiter=";")
+                for row in reader:
+                    pc  = str(row.get("Project Code", "")).strip()
+                    raw = str(row.get("Budget", "")).strip().replace(",", ".")
+                    if not pc:
+                        continue
+                    try:
+                        result[pc] = float(raw)
+                    except ValueError:
+                        pass
+        except Exception:
+            pass
+        return result
 
     # ── Chargement données ───────────────────────────────────────────────
     def _load_data(self):
@@ -3603,7 +3638,7 @@ class PdcMajWindow(tk.Toplevel):
                 (_fmt(conso_date),16, "e", TEXT_PRI),
                 (_fmt(raf),       16, "e", TEXT_PRI),
                 (_fmt(atterr),    16, "e", ACCENT2),
-                ("",              14, "e", TEXT_SEC),
+                (_fmt(self._budgets.get(pc)), 14, "e", TEXT_SEC),
             ]
             row_lbls = []
             for ci, (txt, w, anc, fg) in enumerate(row_data):
