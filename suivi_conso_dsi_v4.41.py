@@ -3503,9 +3503,9 @@ class PdcMajWindow(tk.Toplevel):
             col_tot = sum(data[pc].get(m, 0.0) for pc in projs)
             grand_total += col_tot
             jo = JOURS_OUVRES[m-1]
-            over = (col_tot > jo) and (m >= now_m)   # dépassement uniquement sur mois futurs
-            bg_t = C_PAST if m < now_m else C_HDR
-            fg_t = C_OVER if over else (C_PAST_H if m < now_m else ACCENT2)
+            over = abs(col_tot - jo) > 0.01 and m >= now_m  # tout écart (+ ou -) mois futurs
+            bg_t = C_PAST if m < now_m else (C_OVER if over else C_HDR)
+            fg_t = "#1a1a1a" if over else (C_PAST_H if m < now_m else ACCENT2)
             disp = str(int(col_tot)) if col_tot == int(col_tot) else f"{col_tot:.1f}"
             tk.Label(self._frame_jh, text=disp if col_tot else "",
                      bg=bg_t, fg=fg_t,
