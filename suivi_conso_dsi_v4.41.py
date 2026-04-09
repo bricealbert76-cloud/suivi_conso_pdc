@@ -3099,19 +3099,29 @@ class PdcMajWindow(tk.Toplevel):
         self.after(100, self._load_data)
 
     def _load_budgets(self):
-        """Charge Budgets_2026.csv depuis le répertoire courant.
+        """Charge Budgets_2026.csv (séparateur ';').
+        Cherche dans : 1) répertoire courant  2) répertoire du script.
         Retourne (dict {project_code: budget_float}, set {project_code SurvComm}).
         Logue les résultats dans le Journal de la fenêtre principale.
         """
         import os, csv
-        path     = os.path.join(os.getcwd(), "Budgets_2026.csv")
+        log = self.master._log   # Journal de SuiviConsoApp
+
+        # Recherche du fichier dans le répertoire courant, puis dans le répertoire du script
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        candidates = [
+            os.path.join(os.getcwd(), "Budgets_2026.csv"),
+            os.path.join(script_dir,  "Budgets_2026.csv"),
+        ]
+        path = next((p for p in candidates if os.path.isfile(p)), None)
+
         result   = {}
         survcomm = set()
-        log      = self.master._log   # Journal de SuiviConsoApp
 
-        if not os.path.isfile(path):
-            log("  ⚠  Budgets_2026.csv introuvable dans le répertoire courant "
-                f"({os.getcwd()}).", "warn")
+        if path is None:
+            log("  ⚠  Budgets_2026.csv introuvable. Chemins recherchés :", "warn")
+            for p in candidates:
+                log(f"      • {p}", "warn")
             return result, survcomm
 
         enc = "utf-8-sig"
@@ -3126,10 +3136,22 @@ class PdcMajWindow(tk.Toplevel):
         try:
             with open(path, "r", encoding=enc, errors="replace", newline="") as f:
                 reader = csv.DictReader(f, delimiter=";")
+                # Normalisation des noms de colonnes (insensible à la casse/espaces)
+                if reader.fieldnames:
+                    norm_fields = {
+                        fn.strip().lower().replace(" ", "_"): fn
+                        for fn in reader.fieldnames
+                    }
+                else:
+                    norm_fields = {}
+                col_pc  = norm_fields.get("project_code",  "Project Code")
+                col_bud = norm_fields.get("budget",        "Budget")
+                col_top = norm_fields.get("topsurvcomm",   "TopSurvComm")
+
                 for row in reader:
-                    pc  = str(row.get("Project Code", "")).strip()
-                    raw = str(row.get("Budget", "")).strip().replace(",", ".")
-                    top = str(row.get("TopSurvComm", "")).strip()
+                    pc  = str(row.get(col_pc,  "")).strip()
+                    raw = str(row.get(col_bud, "")).strip().replace(",", ".")
+                    top = str(row.get(col_top, "")).strip()
                     if not pc:
                         continue
                     try:
@@ -3140,8 +3162,9 @@ class PdcMajWindow(tk.Toplevel):
                         survcomm.add(pc)
 
             log("━" * 54, "section")
-            log(f"  Budgets_2026.csv chargé ({enc}) : "
-                f"{len(result)} projet(s), {len(survcomm)} projet(s) SurvComm.", "ok")
+            log(f"  Budgets_2026.csv chargé depuis {path}", "ok")
+            log(f"  {len(result)} projet(s) avec budget, "
+                f"{len(survcomm)} projet(s) SurvComm.", "ok")
 
             # Intervenants SurvComm uniquement (calculés après le chargement du cache)
             survcomm_users = []
