@@ -3174,6 +3174,12 @@ class PdcMajWindow(tk.Toplevel):
             log(f"  Colonnes résolues : Project Code='{col_pc}' | "
                 f"Budget='{col_bud}' | TopSurvComm='{col_top}' | "
                 f"TopVacance='{col_vac}'", "info")
+            # Contenu complet du fichier
+            with open(path, "r", encoding=enc, errors="replace", newline="") as f2:
+                raw_lines = [l.rstrip("\n\r") for l in f2.readlines()]
+            log(f"  Contenu brut ({len(raw_lines)} ligne(s)) :", "info")
+            for line in raw_lines:
+                log(f"    {line}", "info")
             log(f"  {len(result)} projet(s) avec budget, "
                 f"{len(survcomm)} projet(s) SurvComm, "
                 f"{len(vacance)} projet(s) TopVacance.", "ok")
