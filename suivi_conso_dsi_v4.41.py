@@ -1,5 +1,5 @@
 """
-Suivi Consommation DSI - v4.4
+Suivi Consommation DSI - v4.41
 IHM de traitement des fichiers de saisie et plans de charges
   - Suivi Conso : génère un CSV filtré depuis le fichier saisies (.txt)
   - Histo TJM   : calcule et exporte les TJM mensuels par intervenant (Histo_TJM.xlsx)
