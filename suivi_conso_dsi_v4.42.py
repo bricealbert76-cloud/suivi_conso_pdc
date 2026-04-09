@@ -3139,33 +3139,41 @@ class PdcMajWindow(tk.Toplevel):
             with open(path, "r", encoding=enc, errors="replace", newline="") as f:
                 reader = csv.DictReader(f, delimiter=";")
                 # Normalisation des noms de colonnes (insensible à la casse/espaces)
+                raw_fields = reader.fieldnames or []
                 norm_fields = {
                     fn.strip().lower().replace(" ", "_"): fn
-                    for fn in (reader.fieldnames or [])
+                    for fn in raw_fields
                 }
                 col_pc  = norm_fields.get("project_code", "Project Code")
                 col_bud = norm_fields.get("budget",       "Budget")
                 col_top = norm_fields.get("topsurvcomm",  "TopSurvComm")
-                col_vac = norm_fields.get("topvacance",   "TopVacance")
+                # TopVacance : accepte "topvacance" ou "top_vacance"
+                col_vac = norm_fields.get("topvacance",
+                          norm_fields.get("top_vacance",  "TopVacance"))
 
                 for row in reader:
                     pc  = str(row.get(col_pc,  "")).strip()
                     raw = str(row.get(col_bud, "")).strip().replace(",", ".")
                     top = str(row.get(col_top, "")).strip()
-                    vac = str(row.get(col_vac, "")).strip()
+                    vac = str(row.get(col_vac, "")).strip().split(".")[0]  # "1.0" → "1"
                     if not pc:
                         continue
                     try:
                         result[pc] = float(raw)
                     except ValueError:
                         pass
-                    if top:          # non vide → projet SurvComm
+                    if top:        # non vide → projet SurvComm
                         survcomm.add(pc)
-                    if vac == "1":   # TopVacance=1 → absence/congé/maladie
+                    if vac == "1": # TopVacance=1 → absence/congé/maladie
                         vacance.add(pc)
 
             log("━" * 54, "section")
-            log(f"  Budgets_2026.csv chargé depuis {path}", "ok")
+            log(f"  Budgets_2026.csv chargé depuis {path} (encodage : {enc})", "ok")
+            log(f"  Structure : {len(raw_fields)} colonne(s) → "
+                f"{', '.join(raw_fields)}", "info")
+            log(f"  Colonnes résolues : Project Code='{col_pc}' | "
+                f"Budget='{col_bud}' | TopSurvComm='{col_top}' | "
+                f"TopVacance='{col_vac}'", "info")
             log(f"  {len(result)} projet(s) avec budget, "
                 f"{len(survcomm)} projet(s) SurvComm, "
                 f"{len(vacance)} projet(s) TopVacance.", "ok")
