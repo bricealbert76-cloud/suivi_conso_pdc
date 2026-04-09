@@ -3317,19 +3317,23 @@ class PdcMajWindow(tk.Toplevel):
         mois_futurs   = list(range(self._mois_cur, 13))
         interv_actuel = self._interv_var.get()
 
-        # Calcul des écarts — mois pas encore écoulés uniquement
+        # Calcul des écarts — mois pas encore écoulés, PDC uniquement (jamais Diana)
         ecarts = []   # [(u_orig, ecart_total)]
         for u_orig in (self._cache_usernames or []):
-            data = self._get_jh_data(u_orig)
+            u_norm   = _norm_name(u_orig)
+            pdc_prjs = self._cache_jh.get(u_norm, {})   # PDC brut, sans Diana
             ecart_total   = 0.0
             has_ecart_fut = False
-            for m in mois_futurs:          # jamais de mois passés ici
-                jh_m = sum(v for prj_data in data.values()
-                           for k, v in prj_data.items() if k == m)
+            for m in mois_futurs:          # range(mois_cur, 13) — jamais mois passés
+                jh_m = sum(
+                    prj_data.get(m, 0.0)
+                    for prj_data in pdc_prjs.values()
+                    if isinstance(prj_data, dict)
+                )
                 e = jh_m - JOURS_OUVRES[m - 1]
                 ecart_total += e
                 if abs(e) > 0.01:
-                    has_ecart_fut = True   # au moins un mois futur en écart
+                    has_ecart_fut = True
             if has_ecart_fut:
                 ecarts.append((u_orig, ecart_total))
 
@@ -3499,7 +3503,7 @@ class PdcMajWindow(tk.Toplevel):
             col_tot = sum(data[pc].get(m, 0.0) for pc in projs)
             grand_total += col_tot
             jo = JOURS_OUVRES[m-1]
-            over = col_tot > jo
+            over = (col_tot > jo) and (m >= now_m)   # dépassement uniquement sur mois futurs
             bg_t = C_PAST if m < now_m else C_HDR
             fg_t = C_OVER if over else (C_PAST_H if m < now_m else ACCENT2)
             disp = str(int(col_tot)) if col_tot == int(col_tot) else f"{col_tot:.1f}"
