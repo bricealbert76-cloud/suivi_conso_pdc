@@ -3086,19 +3086,34 @@ class PdcMajWindow(tk.Toplevel):
             _os.path.dirname(_os.path.abspath(path_jh)),
             "Modifs_plan_de_charge.log")
 
-        self._budgets = self._load_budgets()
+        self._budgets, self._survcomm_projects = self._load_budgets()
+        # Intervenants travaillant uniquement sur le périmètre SurvComm
+        self._survcomm_intervenants = set()
+        if self._survcomm_projects:
+            for u_orig in (self._cache_usernames or []):
+                u_norm = _norm_name(u_orig)
+                projs  = set(self._cache_jh.get(u_norm, {}).keys())
+                if projs and projs.issubset(self._survcomm_projects):
+                    self._survcomm_intervenants.add(u_orig)
         self._build_ui()
         self.after(100, self._load_data)
 
     def _load_budgets(self):
         """Charge Budgets_2026.csv depuis le répertoire courant.
-        Retourne dict {project_code: budget_float}.
+        Retourne (dict {project_code: budget_float}, set {project_code SurvComm}).
+        Logue les résultats dans le Journal de la fenêtre principale.
         """
         import os, csv
-        path = os.path.join(os.getcwd(), "Budgets_2026.csv")
-        result = {}
+        path     = os.path.join(os.getcwd(), "Budgets_2026.csv")
+        result   = {}
+        survcomm = set()
+        log      = self.master._log   # Journal de SuiviConsoApp
+
         if not os.path.isfile(path):
-            return result
+            log("  ⚠  Budgets_2026.csv introuvable dans le répertoire courant "
+                f"({os.getcwd()}).", "warn")
+            return result, survcomm
+
         enc = "utf-8-sig"
         for c in ("utf-8-sig", "utf-8", "windows-1252", "latin-1"):
             try:
@@ -3114,15 +3129,39 @@ class PdcMajWindow(tk.Toplevel):
                 for row in reader:
                     pc  = str(row.get("Project Code", "")).strip()
                     raw = str(row.get("Budget", "")).strip().replace(",", ".")
+                    top = str(row.get("TopSurvComm", "")).strip()
                     if not pc:
                         continue
                     try:
                         result[pc] = float(raw)
                     except ValueError:
                         pass
-        except Exception:
-            pass
-        return result
+                    if top:   # valeur non vide → projet SurvComm
+                        survcomm.add(pc)
+
+            log("━" * 54, "section")
+            log(f"  Budgets_2026.csv chargé ({enc}) : "
+                f"{len(result)} projet(s), {len(survcomm)} projet(s) SurvComm.", "ok")
+
+            # Intervenants SurvComm uniquement (calculés après le chargement du cache)
+            survcomm_users = []
+            for u_orig in (self._cache_usernames or []):
+                u_norm = _norm_name(u_orig)
+                projs  = set(self._cache_jh.get(u_norm, {}).keys())
+                if projs and projs.issubset(survcomm):
+                    survcomm_users.append(u_orig)
+            if survcomm_users:
+                log(f"  Intervenant(s) exclusivement SurvComm "
+                    f"({len(survcomm_users)}) — exclus des écarts JH/JO :", "info")
+                for u in survcomm_users:
+                    log(f"      • {u}", "info")
+            else:
+                log("  Aucun intervenant exclusivement SurvComm.", "info")
+
+        except Exception as e:
+            log(f"  ✘  Erreur lecture Budgets_2026.csv : {e}", "error")
+
+        return result, survcomm
 
     # ── Chargement données ───────────────────────────────────────────────
     def _load_data(self):
@@ -3355,6 +3394,8 @@ class PdcMajWindow(tk.Toplevel):
         # Calcul des écarts — mois pas encore écoulés, PDC uniquement (jamais Diana)
         ecarts = []   # [(u_orig, ecart_total)]
         for u_orig in (self._cache_usernames or []):
+            if u_orig in self._survcomm_intervenants:
+                continue   # exclus : travaille uniquement sur périmètre SurvComm
             u_norm   = _norm_name(u_orig)
             pdc_prjs = self._cache_jh.get(u_norm, {})   # PDC brut, sans Diana
             ecart_total   = 0.0
