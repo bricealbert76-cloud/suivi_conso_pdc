@@ -1,11 +1,11 @@
 """
-Suivi Consommation DSI - v4.31
+Suivi Consommation DSI - v4.4
 IHM de traitement des fichiers de saisie et plans de charges
   - Suivi Conso : génère un CSV filtré depuis le fichier saisies (.txt)
   - Histo TJM   : calcule et exporte les TJM mensuels par intervenant (Histo_TJM.xlsx)
 """
 
-VERSION = "4.31"
+VERSION = "4.4"
 
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, scrolledtext
@@ -3210,6 +3210,7 @@ class PdcMajWindow(tk.Toplevel):
         self._added_rows.clear()
         self._build_table_jh(interv)
         self._build_table_eur(interv)
+        self._build_ecart_list()
 
     def _get_jh_data(self, interv):
         """Retourne dict projet_code → {mois_num: jh, "_lib": libelle}
@@ -3306,6 +3307,86 @@ class PdcMajWindow(tk.Toplevel):
 
 
     # ── Construction tableau JH ──────────────────────────────────────────
+    def _build_ecart_list(self):
+        """Construit la liste des intervenants dont le total JH (mois futurs)
+        diffère des jours ouvrés. Affiché à droite du tableau JH."""
+        for w in self._frame_ecart.winfo_children():
+            w.destroy()
+
+        JOURS_OUVRES  = _calc_jours_ouvres(self._annee)
+        mois_futurs   = list(range(self._mois_cur, 13))
+        interv_actuel = self._interv_var.get()
+
+        # Calcul des écarts pour tous les intervenants
+        ecarts = []   # [(u_orig, ecart_total)]
+        for u_orig in (self._cache_usernames or []):
+            data = self._get_jh_data(u_orig)
+            ecart_total = 0.0
+            for m in mois_futurs:
+                jh_m = sum(v for prj_data in data.values()
+                           for k, v in prj_data.items() if k == m)
+                ecart_total += jh_m - JOURS_OUVRES[m - 1]
+            if abs(ecart_total) > 0.01:
+                ecarts.append((u_orig, ecart_total))
+
+        # Titre
+        tk.Label(self._frame_ecart,
+                 text=f"  ⚠ Écarts JH/JO  ({len(ecarts)})",
+                 bg=BG_PANEL, fg=WARN, font=FONT_HEAD,
+                 anchor="w").pack(fill="x", pady=(6, 4))
+
+        # Listbox + scrollbar
+        lb_frame = tk.Frame(self._frame_ecart, bg=BG_PANEL)
+        lb_frame.pack(fill="both", expand=True, padx=4, pady=(0, 6))
+        vsb = tk.Scrollbar(lb_frame, orient="vertical")
+        vsb.pack(side="right", fill="y")
+        self._ecart_listbox = tk.Listbox(
+            lb_frame, bg=BG_CARD, fg=TEXT_PRI, font=FONT_SMALL,
+            selectbackground=ACCENT2, selectforeground="#ffffff",
+            bd=0, relief="flat", activestyle="none",
+            yscrollcommand=vsb.set, width=30)
+        self._ecart_listbox.pack(side="left", fill="both", expand=True)
+        vsb.config(command=self._ecart_listbox.yview)
+
+        self._ecart_usernames = []
+        sel_idx = None
+        for i, (u_orig, ecart) in enumerate(ecarts):
+            sign  = "+" if ecart > 0 else ""
+            label = f"{u_orig[:24]:<24}  {sign}{ecart:.1f}"
+            self._ecart_listbox.insert("end", label)
+            self._ecart_usernames.append(u_orig)
+            if u_orig == interv_actuel:
+                sel_idx = i
+
+        if sel_idx is not None:
+            self._ecart_listbox.selection_set(sel_idx)
+            self._ecart_listbox.see(sel_idx)
+
+        def _on_click(event):
+            sel = self._ecart_listbox.curselection()
+            if not sel:
+                return
+            u = self._ecart_usernames[sel[0]]
+            if u == self._interv_var.get():
+                return   # déjà sélectionné, évite boucle infinie
+            self._interv_var.set(u)
+            self._refresh_tables()
+
+        self._ecart_listbox.bind("<<ListboxSelect>>", _on_click)
+        self._frame_jh.after(80, self._sync_ecart_height)
+
+    def _sync_ecart_height(self):
+        """Ajuste la hauteur de la listbox pour correspondre au tableau JH."""
+        if not hasattr(self, '_ecart_listbox'):
+            return
+        h = self._frame_jh.winfo_height()
+        if h <= 20:
+            return
+        row_h = 16   # hauteur approx. d'une ligne (font Consolas 9)
+        header_h = 36
+        nb_rows = max(3, (h - header_h) // row_h)
+        self._ecart_listbox.config(height=nb_rows)
+
     def _build_table_jh(self, interv):
         """Reconstruit le tableau JH dans le canvas."""
         for w in self._frame_jh.winfo_children():
@@ -3701,11 +3782,17 @@ class PdcMajWindow(tk.Toplevel):
         canvas.bind_all("<MouseWheel>",
                         lambda e: canvas.yview_scroll(-1 if e.delta > 0 else 1, "units"))
 
-        # Tableau JH
+        # Tableau JH + liste des écarts côte à côte
         tk.Label(inner, text="Plan de charges en JH (mois passés modifiables)",
                  bg=BG_MAIN, fg=ACCENT2, font=FONT_BODY).pack(anchor="w", pady=(6, 2))
-        self._frame_jh = tk.Frame(inner, bg=BG_MAIN)
-        self._frame_jh.pack(anchor="w", pady=(0, 12))
+        jh_ecart_outer = tk.Frame(inner, bg=BG_MAIN)
+        jh_ecart_outer.pack(anchor="w", fill="x", pady=(0, 12))
+        self._frame_jh = tk.Frame(jh_ecart_outer, bg=BG_MAIN)
+        self._frame_jh.pack(side="left", anchor="nw", padx=(0, 16))
+        self._frame_ecart = tk.Frame(jh_ecart_outer, bg=BG_PANEL,
+                                     highlightbackground=BORDER, highlightthickness=1)
+        self._frame_ecart.pack(side="left", anchor="nw")
+        self._frame_jh.bind("<Configure>", lambda e: self._sync_ecart_height())
 
         tk.Frame(inner, bg=BORDER, height=1).pack(fill="x", pady=4)
 
