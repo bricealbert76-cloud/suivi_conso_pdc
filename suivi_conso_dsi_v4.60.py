@@ -1,11 +1,11 @@
 """
-Suivi Consommation DSI - v4.59
+Suivi Consommation DSI - v4.60
 IHM de traitement des fichiers de saisie et plans de charges
   - Suivi Conso : génère un CSV filtré depuis le fichier saisies (.txt)
   - Histo TJM   : calcule et exporte les TJM mensuels par intervenant (Histo_TJM.xlsx)
 """
 
-VERSION = "4.59"
+VERSION = "4.60"
 
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, scrolledtext
