@@ -2339,19 +2339,24 @@ class SuiviConsoApp(tk.Tk):
 
     def _open_pdc_maj_window_now(self):
         """Ouvre effectivement la fenêtre PdcMajWindow (cache disponible)."""
+        self._log("  ▶  Ouverture fenêtre MAJ Plan de charges…", "info")
         path_jh  = self.file2_path.get()
         path_eur = self.file3_path.get()
-        win = PdcMajWindow(self, path_jh, path_eur,
-                           cache_usernames=self.pdc_usernames,
-                           cache_jh=self.pdc_jh_data,
-                           cache_eur=self.pdc_eur_data,
-                           cache_eur_detail=self.pdc_eur_detail,
-                           diana_jh=self.diana_jh_data,
-                           diana_eur=self.diana_eur_data,
-                           histo_tjm=self.histo_tjm_data,
-                           cache_ready=self._pdc_cache_ready,
-                           nucleus_exclusions=self._nucleus_exclusions)
-        win.focus_set()
+        try:
+            win = PdcMajWindow(self, path_jh, path_eur,
+                               cache_usernames=self.pdc_usernames,
+                               cache_jh=self.pdc_jh_data,
+                               cache_eur=self.pdc_eur_data,
+                               cache_eur_detail=self.pdc_eur_detail,
+                               diana_jh=self.diana_jh_data,
+                               diana_eur=self.diana_eur_data,
+                               histo_tjm=self.histo_tjm_data,
+                               cache_ready=self._pdc_cache_ready,
+                               nucleus_exclusions=self._nucleus_exclusions)
+            win.lift()
+            win.focus_force()
+        except Exception as e:
+            self._log(f"  ✘  Erreur ouverture MAJ PDC : {e}\n{traceback.format_exc()}", "error")
 
     def _update_diana_btn(self):
         has_diana = bool(self.file1_path.get())
