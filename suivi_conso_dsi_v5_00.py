@@ -2619,7 +2619,7 @@ class SuiviConsoApp(tk.Tk):
                     os.path.dirname(os.path.abspath(__file__)),
                     "Histo_TJM.xlsx")
                 histo_tjm = {}
-                if HAS_OPENPYXL and _os2.path.isfile(path_histo):
+                if HAS_OPENPYXL and os.path.isfile(path_histo):
                     wb_h = openpyxl.load_workbook(path_histo, read_only=True, data_only=True)
                     ws_h = wb_h.active
                     for ri, row in enumerate(ws_h.iter_rows(values_only=True)):
