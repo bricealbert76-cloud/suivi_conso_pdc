@@ -469,6 +469,29 @@ class SuiviConsoApp(tk.Tk):
                  fg=TEXT_SEC, font=FONT_SMALL, anchor="w", padx=12).pack(fill="x")
 
     def _build_file_panel(self, parent):
+        # ── Panneau défilable : tout le contenu dans un Canvas + Scrollbar ──
+        canvas = tk.Canvas(parent, bg=BG_PANEL, bd=0, highlightthickness=0)
+        vsb    = tk.Scrollbar(parent, orient="vertical", command=canvas.yview)
+        canvas.configure(yscrollcommand=vsb.set)
+        vsb.pack(side="right", fill="y")
+        canvas.pack(side="left", fill="both", expand=True)
+
+        inner  = tk.Frame(canvas, bg=BG_PANEL)
+        win_id = canvas.create_window((0, 0), window=inner, anchor="nw")
+
+        inner.bind("<Configure>",
+                   lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.bind("<Configure>",
+                    lambda e: canvas.itemconfig(win_id, width=e.width))
+
+        # Molette de souris active seulement quand le curseur survole le panneau
+        def _mw(e): canvas.yview_scroll(int(-1 * (e.delta / 120)), "units")
+        canvas.bind("<Enter>", lambda e: canvas.bind_all("<MouseWheel>", _mw))
+        canvas.bind("<Leave>", lambda e: canvas.unbind_all("<MouseWheel>"))
+
+        # Le contenu ci-dessous est bâti sur `inner` (alias `parent` local)
+        parent = inner
+
         tk.Label(parent, text="SOURCES DE DONNÉES", bg=BG_PANEL,
                  fg=ACCENT2, font=FONT_HEAD).pack(anchor="w", padx=10, pady=(10, 14))
 
