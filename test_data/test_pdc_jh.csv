@@ -1,0 +1,131 @@
+Intervenant;Mois;PRJ_CodeProjet;NbJours;PRJ_LibelleProjet;Year of charge;PRJ_RespNiv1;Code UT;Type Intervenant
+MARTIN, Jean;janvier;A12345;19;Projet Alpha;2026;DURAND, Claire;RGU;CA-CIB
+MARTIN, Jean;février;A12345;19;Projet Alpha;2026;DURAND, Claire;RGU;CA-CIB
+MARTIN, Jean;mars;A12345;20;Projet Alpha;2026;DURAND, Claire;RGU;CA-CIB
+MARTIN, Jean;avril;A12345;21;Projet Alpha;2026;DURAND, Claire;RGU;CA-CIB
+MARTIN, Jean;mai;A12345;21;Projet Alpha;2026;DURAND, Claire;RGU;CA-CIB
+MARTIN, Jean;juin;A12345;20;Projet Alpha;2026;DURAND, Claire;RGU;CA-CIB
+MARTIN, Jean;juillet;A12345;22;Projet Alpha;2026;DURAND, Claire;RGU;CA-CIB
+MARTIN, Jean;août;A12345;21;Projet Alpha;2026;DURAND, Claire;RGU;CA-CIB
+MARTIN, Jean;septembre;A12345;22;Projet Alpha;2026;DURAND, Claire;RGU;CA-CIB
+MARTIN, Jean;octobre;A12345;21;Projet Alpha;2026;DURAND, Claire;RGU;CA-CIB
+MARTIN, Jean;novembre;A12345;21;Projet Alpha;2026;DURAND, Claire;RGU;CA-CIB
+MARTIN, Jean;décembre;A12345;22;Projet Alpha;2026;DURAND, Claire;RGU;CA-CIB
+MARTIN, Jean;janvier;P02508;2;CPL - Target Architecture;2026;MOREAU, Luc;RGU;CA-CIB
+MARTIN, Jean;février;P02508;1;CPL - Target Architecture;2026;MOREAU, Luc;RGU;CA-CIB
+MARTIN, Jean;mars;P02508;0;CPL - Target Architecture;2026;MOREAU, Luc;RGU;CA-CIB
+DUPONT, Marie;janvier;A12345;20;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+DUPONT, Marie;février;A12345;20;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+DUPONT, Marie;mars;A12345;20;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+DUPONT, Marie;avril;A12345;22;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+DUPONT, Marie;mai;A12345;21;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+DUPONT, Marie;juin;A12345;20;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+DUPONT, Marie;juillet;A12345;22;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+DUPONT, Marie;août;A12345;21;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+DUPONT, Marie;septembre;A12345;22;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+DUPONT, Marie;octobre;A12345;21;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+DUPONT, Marie;novembre;A12345;21;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+DUPONT, Marie;décembre;A12345;22;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+RENARD, Thomas;janvier;B11111;21;Projet Beta;2026;PETIT, Anne;RGU;CA-CIB
+RENARD, Thomas;février;B11111;20;Projet Beta;2026;PETIT, Anne;RGU;CA-CIB
+RENARD, Thomas;mars;B11111;20;Projet Beta;2026;PETIT, Anne;RGU;CA-CIB
+RENARD, Thomas;avril;B11111;22;Projet Beta;2026;PETIT, Anne;RGU;CA-CIB
+RENARD, Thomas;mai;B11111;21;Projet Beta;2026;PETIT, Anne;RGU;CA-CIB
+RENARD, Thomas;juin;B11111;20;Projet Beta;2026;PETIT, Anne;RGU;CA-CIB
+RENARD, Thomas;juillet;B11111;22;Projet Beta;2026;PETIT, Anne;RGU;CA-CIB
+RENARD, Thomas;août;B11111;21;Projet Beta;2026;PETIT, Anne;RGU;CA-CIB
+RENARD, Thomas;septembre;B11111;22;Projet Beta;2026;PETIT, Anne;RGU;CA-CIB
+RENARD, Thomas;octobre;B11111;21;Projet Beta;2026;PETIT, Anne;RGU;CA-CIB
+RENARD, Thomas;novembre;B11111;21;Projet Beta;2026;PETIT, Anne;RGU;CA-CIB
+RENARD, Thomas;décembre;B11111;22;Projet Beta;2026;PETIT, Anne;RGU;CA-CIB
+LECOMTE, Sophie;janvier;A67890;21;Projet Gamma;2026;DURAND, Claire;RGU;Prestataire
+LECOMTE, Sophie;février;A67890;20;Projet Gamma;2026;DURAND, Claire;RGU;Prestataire
+LECOMTE, Sophie;mars;A67890;20;Projet Gamma;2026;DURAND, Claire;RGU;Prestataire
+LECOMTE, Sophie;avril;A67890;22;Projet Gamma;2026;DURAND, Claire;RGU;Prestataire
+LECOMTE, Sophie;mai;A67890;21;Projet Gamma;2026;DURAND, Claire;RGU;Prestataire
+LECOMTE, Sophie;juin;A67890;20;Projet Gamma;2026;DURAND, Claire;RGU;Prestataire
+LECOMTE, Sophie;juillet;A67890;22;Projet Gamma;2026;DURAND, Claire;RGU;Prestataire
+LECOMTE, Sophie;août;A67890;21;Projet Gamma;2026;DURAND, Claire;RGU;Prestataire
+LECOMTE, Sophie;septembre;A67890;22;Projet Gamma;2026;DURAND, Claire;RGU;Prestataire
+LECOMTE, Sophie;octobre;A67890;21;Projet Gamma;2026;DURAND, Claire;RGU;Prestataire
+LECOMTE, Sophie;novembre;A67890;21;Projet Gamma;2026;DURAND, Claire;RGU;Prestataire
+LECOMTE, Sophie;décembre;A67890;22;Projet Gamma;2026;DURAND, Claire;RGU;Prestataire
+BENOIT, Lucas;janvier;P04243;15;Projet Delta;2026;MOREAU, Luc;RGU;CA-CIB
+BENOIT, Lucas;février;P04243;18;Projet Delta;2026;MOREAU, Luc;RGU;CA-CIB
+BENOIT, Lucas;mars;P04243;20;Projet Delta;2026;MOREAU, Luc;RGU;CA-CIB
+BENOIT, Lucas;avril;P04243;22;Projet Delta;2026;MOREAU, Luc;RGU;CA-CIB
+BENOIT, Lucas;mai;P04243;21;Projet Delta;2026;MOREAU, Luc;RGU;CA-CIB
+BENOIT, Lucas;juin;P04243;20;Projet Delta;2026;MOREAU, Luc;RGU;CA-CIB
+BENOIT, Lucas;juillet;P04243;22;Projet Delta;2026;MOREAU, Luc;RGU;CA-CIB
+BENOIT, Lucas;août;P04243;21;Projet Delta;2026;MOREAU, Luc;RGU;CA-CIB
+BENOIT, Lucas;septembre;P04243;22;Projet Delta;2026;MOREAU, Luc;RGU;CA-CIB
+BENOIT, Lucas;octobre;P04243;21;Projet Delta;2026;MOREAU, Luc;RGU;CA-CIB
+BENOIT, Lucas;novembre;P04243;21;Projet Delta;2026;MOREAU, Luc;RGU;CA-CIB
+BENOIT, Lucas;décembre;P04243;22;Projet Delta;2026;MOREAU, Luc;RGU;CA-CIB
+FAURE, Claire;janvier;A12345;21;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+FAURE, Claire;février;A12345;20;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+FAURE, Claire;mars;A12345;20;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+FAURE, Claire;avril;A12345;22;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+FAURE, Claire;mai;A12345;21;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+FAURE, Claire;juin;A12345;20;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+FAURE, Claire;juillet;A12345;22;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+FAURE, Claire;août;A12345;21;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+FAURE, Claire;septembre;A12345;22;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+FAURE, Claire;octobre;A12345;21;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+FAURE, Claire;novembre;A12345;21;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+FAURE, Claire;décembre;A12345;22;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+LECLERC, Emma;janvier;S99901;21;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;CA-CIB
+LECLERC, Emma;février;S99901;20;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;CA-CIB
+LECLERC, Emma;mars;S99901;20;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;CA-CIB
+LECLERC, Emma;avril;S99901;22;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;CA-CIB
+LECLERC, Emma;mai;S99901;21;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;CA-CIB
+LECLERC, Emma;juin;S99901;20;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;CA-CIB
+LECLERC, Emma;juillet;S99901;22;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;CA-CIB
+LECLERC, Emma;août;S99901;21;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;CA-CIB
+LECLERC, Emma;septembre;S99901;22;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;CA-CIB
+LECLERC, Emma;octobre;S99901;21;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;CA-CIB
+LECLERC, Emma;novembre;S99901;21;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;CA-CIB
+LECLERC, Emma;décembre;S99901;22;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;CA-CIB
+NGUYEN, Hoa;janvier;N00001;21;Projet Analytics;2026;VINCENT, Paul;Analytics;Prestataire
+NGUYEN, Hoa;février;N00001;20;Projet Analytics;2026;VINCENT, Paul;Analytics;Prestataire
+NGUYEN, Hoa;mars;N00001;20;Projet Analytics;2026;VINCENT, Paul;Analytics;Prestataire
+NGUYEN, Hoa;avril;N00001;22;Projet Analytics;2026;VINCENT, Paul;Analytics;Prestataire
+NGUYEN, Hoa;mai;N00001;21;Projet Analytics;2026;VINCENT, Paul;Analytics;Prestataire
+NGUYEN, Hoa;juin;N00001;20;Projet Analytics;2026;VINCENT, Paul;Analytics;Prestataire
+NGUYEN, Hoa;juillet;N00001;22;Projet Analytics;2026;VINCENT, Paul;Analytics;Prestataire
+NGUYEN, Hoa;août;N00001;21;Projet Analytics;2026;VINCENT, Paul;Analytics;Prestataire
+NGUYEN, Hoa;septembre;N00001;22;Projet Analytics;2026;VINCENT, Paul;Analytics;Prestataire
+NGUYEN, Hoa;octobre;N00001;21;Projet Analytics;2026;VINCENT, Paul;Analytics;Prestataire
+NGUYEN, Hoa;novembre;N00001;21;Projet Analytics;2026;VINCENT, Paul;Analytics;Prestataire
+NGUYEN, Hoa;décembre;N00001;22;Projet Analytics;2026;VINCENT, Paul;Analytics;Prestataire
+GUITTARD, Raphael;janvier;A12345;18;Projet Alpha;2026;DURAND, Claire;RGU;CA-CIB
+GUITTARD, Raphael;janvier;S99901;2;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;CA-CIB
+GUITTARD, Raphael;janvier;P02508;1;CPL - Target Architecture;2026;MOREAU, Luc;RGU;CA-CIB
+GUITTARD, Raphael;février;A12345;18;Projet Alpha;2026;DURAND, Claire;RGU;CA-CIB
+GUITTARD, Raphael;février;S99901;2;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;CA-CIB
+GUITTARD, Raphael;mars;A12345;19;Projet Alpha;2026;DURAND, Claire;RGU;CA-CIB
+GUITTARD, Raphael;mars;S99901;1;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;CA-CIB
+GUITTARD, Raphael;avril;A12345;20;Projet Alpha;2026;DURAND, Claire;RGU;CA-CIB
+GUITTARD, Raphael;avril;S99901;2;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;CA-CIB
+GUITTARD, Raphael;mai;A12345;19;Projet Alpha;2026;DURAND, Claire;RGU;CA-CIB
+GUITTARD, Raphael;mai;S99901;2;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;CA-CIB
+GUITTARD, Raphael;juin;A12345;18;Projet Alpha;2026;DURAND, Claire;RGU;CA-CIB
+GUITTARD, Raphael;juin;S99901;2;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;CA-CIB
+ABDELLI, Ahmed;janvier;A12345;19;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+ABDELLI, Ahmed;janvier;S99901;2;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;Prestataire
+ABDELLI, Ahmed;février;A12345;18;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+ABDELLI, Ahmed;février;S99901;2;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;Prestataire
+ABDELLI, Ahmed;mars;A12345;19;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+ABDELLI, Ahmed;mars;P02508;1;CPL - Target Architecture;2026;MOREAU, Luc;RGU;Prestataire
+ABDELLI, Ahmed;avril;A12345;20;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+ABDELLI, Ahmed;avril;P02508;2;CPL - Target Architecture;2026;MOREAU, Luc;RGU;Prestataire
+ABDELLI, Ahmed;mai;A12345;19;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+ABDELLI, Ahmed;mai;P02508;2;CPL - Target Architecture;2026;MOREAU, Luc;RGU;Prestataire
+ABDELLI, Ahmed;juin;A12345;18;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+ABDELLI, Ahmed;juin;P02508;2;CPL - Target Architecture;2026;MOREAU, Luc;RGU;Prestataire
+TCHIEGAING KAMGUIA, Arnaud;janvier;N00001;21;Projet Analytics;2026;VINCENT, Paul;Analytics;Prestataire
+TCHIEGAING KAMGUIA, Arnaud;février;N00001;20;Projet Analytics;2026;VINCENT, Paul;Analytics;Prestataire
+TCHIEGAING KAMGUIA, Arnaud;mars;N00001;20;Projet Analytics;2026;VINCENT, Paul;Analytics;Prestataire
+TCHIEGAING KAMGUIA, Arnaud;avril;N00001;22;Projet Analytics;2026;VINCENT, Paul;Analytics;Prestataire
+TCHIEGAING KAMGUIA, Arnaud;mai;N00001;21;Projet Analytics;2026;VINCENT, Paul;Analytics;Prestataire
+TCHIEGAING KAMGUIA, Arnaud;juin;N00001;20;Projet Analytics;2026;VINCENT, Paul;Analytics;Prestataire
