@@ -3519,16 +3519,8 @@ class PdcMajWindow(tk.Toplevel):
         self._frame_jh.after(80, self._sync_ecart_height)
 
     def _sync_ecart_height(self):
-        """Ajuste la hauteur de la listbox pour correspondre au tableau JH."""
-        if not hasattr(self, '_ecart_listbox'):
-            return
-        h = self._frame_jh.winfo_height()
-        if h <= 20:
-            return
-        row_h = 16   # hauteur approx. d'une ligne (font Consolas 9)
-        header_h = 36
-        nb_rows = max(3, (h - header_h) // row_h)
-        self._ecart_listbox.config(height=nb_rows)
+        """Obsolète : écarts dans leur propre quadrant, pas besoin de synchro."""
+        pass
 
     def _build_table_jh(self, interv):
         """Reconstruit le tableau JH dans le canvas."""
@@ -3899,60 +3891,66 @@ class PdcMajWindow(tk.Toplevel):
                  fg=TEXT_SEC, font=FONT_SMALL, anchor="w",
                  padx=12).pack(fill="x", side="bottom")
 
-        # ── Zone principale : body = (gauche scrollable) + (droite détail fixe) ──
-        body = tk.Frame(self, bg=BG_MAIN)
-        body.pack(fill="both", expand=True, padx=0, pady=4)
-
+        # ── Zone principale : grille 2×2 ──────────────────────────────────
         self._selected_proj = None
-        self._frame_detail  = tk.Frame(self, bg=BG_MAIN)  # initialisé dans _build_ui
 
-        # ── Zone gauche scrollable (JH + EUR) ────────────────────────────
-        left_outer = tk.Frame(body, bg=BG_MAIN)
-        left_outer.pack(side="left", fill="both", expand=True)
-        canvas = tk.Canvas(left_outer, bg=BG_MAIN, bd=0, highlightthickness=0)
-        vsb    = tk.Scrollbar(left_outer, orient="vertical", command=canvas.yview)
-        hsb    = tk.Scrollbar(left_outer, orient="horizontal", command=canvas.xview)
-        canvas.configure(yscrollcommand=vsb.set, xscrollcommand=hsb.set)
-        vsb.pack(side="right", fill="y")
-        hsb.pack(side="bottom", fill="x")
-        canvas.pack(side="left", fill="both", expand=True)
-        inner = tk.Frame(canvas, bg=BG_MAIN)
-        cw = canvas.create_window((0, 0), window=inner, anchor="nw")
-        inner.bind("<Configure>",
-                   lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
-        canvas.bind("<Configure>",
-                    lambda e: canvas.itemconfig(cw, width=e.width))
-        canvas.bind_all("<MouseWheel>",
-                        lambda e: canvas.yview_scroll(-1 if e.delta > 0 else 1, "units"))
+        body = tk.Frame(self, bg=BG_MAIN)
+        body.pack(fill="both", expand=True, padx=4, pady=4)
+        body.columnconfigure(0, weight=3)
+        body.columnconfigure(1, weight=2)
+        body.rowconfigure(0, weight=1)
+        body.rowconfigure(1, weight=1)
 
-        # Tableau JH + liste des écarts côte à côte
-        tk.Label(inner, text="Plan de charges en JH (mois passés modifiables)",
-                 bg=BG_MAIN, fg=ACCENT2, font=FONT_BODY).pack(anchor="w", pady=(6, 2))
-        jh_ecart_outer = tk.Frame(inner, bg=BG_MAIN)
-        jh_ecart_outer.pack(anchor="w", fill="x", pady=(0, 12))
-        self._frame_jh = tk.Frame(jh_ecart_outer, bg=BG_MAIN)
-        self._frame_jh.pack(side="left", anchor="nw", padx=(0, 16))
-        self._frame_ecart = tk.Frame(jh_ecart_outer, bg=BG_PANEL,
-                                     highlightbackground=BORDER, highlightthickness=1)
-        self._frame_ecart.pack(side="left", anchor="nw")
-        self._frame_jh.bind("<Configure>", lambda e: self._sync_ecart_height())
+        def _make_quad(title, row, col):
+            """Crée un quadrant avec titre, canvas scrollable et scrollbars."""
+            outer = tk.Frame(body, bg=BG_PANEL,
+                             highlightbackground=BORDER, highlightthickness=1)
+            outer.grid(row=row, column=col, sticky="nsew", padx=4, pady=4)
+            tk.Label(outer, text=title, bg=BG_PANEL, fg=ACCENT2,
+                     font=FONT_BODY, anchor="w").pack(fill="x", padx=6, pady=(4, 2))
+            tk.Frame(outer, bg=BORDER, height=1).pack(fill="x")
+            cf = tk.Frame(outer, bg=BG_PANEL)
+            cf.pack(fill="both", expand=True)
+            vsb = tk.Scrollbar(cf, orient="vertical")
+            hsb = tk.Scrollbar(cf, orient="horizontal")
+            c = tk.Canvas(cf, bg=BG_MAIN, bd=0, highlightthickness=0,
+                          yscrollcommand=vsb.set, xscrollcommand=hsb.set)
+            vsb.config(command=c.yview)
+            hsb.config(command=c.xview)
+            vsb.pack(side="right", fill="y")
+            hsb.pack(side="bottom", fill="x")
+            c.pack(side="left", fill="both", expand=True)
+            inner = tk.Frame(c, bg=BG_MAIN)
+            cw = c.create_window((0, 0), window=inner, anchor="nw")
+            inner.bind("<Configure>",
+                       lambda e, cv=c: cv.configure(scrollregion=cv.bbox("all")))
+            c.bind("<Configure>",
+                   lambda e, cv=c, w=cw: cv.itemconfig(w, width=e.width))
+            c.bind("<Enter>",
+                   lambda e, cv=c: cv.bind_all(
+                       "<MouseWheel>",
+                       lambda ev, cv=cv: cv.yview_scroll(
+                           -1 if ev.delta > 0 else 1, "units")))
+            c.bind("<Leave>",
+                   lambda e, cv=c: cv.unbind_all("<MouseWheel>"))
+            return inner
 
-        tk.Frame(inner, bg=BORDER, height=1).pack(fill="x", pady=4)
+        # Quadrant haut-gauche : Plan de charges JH
+        self._frame_jh = _make_quad(
+            "Plan de charges en JH  (mois passés modifiables)", 0, 0)
 
-        # Tableau EUR + détail côte à côte
-        tk.Label(inner,
-                 text="Atterrissage en € (intervenants RGU)"
-                      "  —  cliquer sur une ligne pour voir le détail par intervenant",
-                 bg=BG_MAIN, fg=ACCENT2, font=FONT_BODY).pack(anchor="w", pady=(6, 2))
-        eur_container = tk.Frame(inner, bg=BG_MAIN)
-        eur_container.pack(anchor="w", fill="x", pady=(0, 12))
-        self._frame_eur = tk.Frame(eur_container, bg=BG_MAIN)
-        self._frame_eur.pack(side="left", anchor="nw", padx=(0, 16))
-        self._frame_detail_container = tk.Frame(eur_container, bg=BG_MAIN)
-        self._frame_detail_container.pack(side="left", anchor="nw")
-        # Créer le frame de détail dans son container
-        self._frame_detail = tk.Frame(self._frame_detail_container, bg=BG_MAIN)
-        self._frame_detail.pack(anchor="nw")
+        # Quadrant haut-droite : Écarts JH / JO
+        self._frame_ecart = _make_quad("Écarts JH / JO", 0, 1)
+
+        # Quadrant bas-gauche : Alimentation en €
+        self._frame_eur = _make_quad(
+            "Alimentation en €  —  cliquer sur une ligne pour le détail", 1, 0)
+
+        # Quadrant bas-droite : Détail intervenants
+        inner_det = _make_quad("Détail intervenants", 1, 1)
+        self._frame_detail_container = inner_det
+        self._frame_detail = tk.Frame(inner_det, bg=BG_MAIN)
+        self._frame_detail.pack(anchor="nw", padx=4, pady=4)
 
 # ─────────────────────────────────────────────
 #  POINT D'ENTRÉE

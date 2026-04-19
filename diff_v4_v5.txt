@@ -1,0 +1,310 @@
+--- v4_78
++++ v5_00
+@@ -89,0 +90,14 @@
++
+
++  v5.00 : corrections issues de l'audit qualité (3 priorités critiques)
+
++    - FIX 1 — Performance boucle Diana (_process_file1) :
+
++        idx_date_src, idx_value_src, idx_ufirst_src, idx_ulast_src et skip_src
+
++        déplacés AVANT la boucle (étaient recalculés N fois via SRC_COLS.index()).
+
++        Idem pour _fv dans la boucle Diana de _preload_pdc_cache.
+
++    - FIX 2 — Concurrence _preprocess_sources :
+
++        Ajout de self._preprocess_lock (threading.Lock) pour éviter la génération
+
++        parallèle des CSV filtrés (risque de corruption si deux traitements
+
++        déclenchés simultanément).
+
++    - FIX 3 — Thread-safety logs _preload_pdc_cache :
+
++        Les messages de log produits dans _run() (csv_only / pdc_only)
+
++        sont collectés dans une liste et émis dans _done() qui s'exécute
+
++        dans le thread principal via self.after(0, _done).
+
+@@ -92 +106 @@
+-VERSION = "4.78"
+
++VERSION = "5.00"
+
+@@ -97,0 +112,2 @@
++import re
+
++import glob
+
+@@ -98,0 +115 @@
++import traceback
+
+@@ -100,0 +118 @@
++from collections import OrderedDict
+
+@@ -400,0 +419,3 @@
++
+
++        # FIX 2 — Verrou pour éviter les appels concurrents à _preprocess_sources
+
++        self._preprocess_lock = threading.Lock()
+
+@@ -644 +664,0 @@
+-        import glob, re
+
+@@ -708 +727,0 @@
+-        import glob, re
+
+@@ -951 +969,0 @@
+-                import traceback
+
+@@ -996,0 +1015,4 @@
++
+
++        FIX 2 — Protégé par _preprocess_lock pour éviter toute exécution
+
++        concurrente (risque de corruption des CSV filtrés si deux traitements
+
++        sont déclenchés simultanément depuis des threads différents).
+
+@@ -998,16 +1020,18 @@
+-        self._log("━" * 54, "section")
+
+-        self._log(" PRÉTRAITEMENT — génération CSV filtrés", "section")
+
+-        self._log("━" * 54, "section")
+
+-
+
+-        path_diana_eff = self._preprocess_diana()
+
+-        path_jh_eff    = self._preprocess_pdc(self.file2_path.get(), label="JH")
+
+-        path_eur_eff   = self._preprocess_pdc(self.file3_path.get(), label="EUR")
+
+-
+
+-        self._log("━" * 54, "section")
+
+-        self._log(" PRÉTRAITEMENT TERMINÉ", "section")
+
+-        self._log(f"  Diana : {os.path.basename(path_diana_eff)}", "ok")
+
+-        self._log(f"  JH    : {os.path.basename(path_jh_eff)}", "ok")
+
+-        self._log(f"  EUR   : {os.path.basename(path_eur_eff)}", "ok")
+
+-        self._log("━" * 54, "section")
+
+-
+
+-        return path_diana_eff, path_jh_eff, path_eur_eff
+
++        # FIX 2 — Acquisition du verrou : un seul prétraitement à la fois
+
++        with self._preprocess_lock:
+
++            self._log("━" * 54, "section")
+
++            self._log(" PRÉTRAITEMENT — génération CSV filtrés", "section")
+
++            self._log("━" * 54, "section")
+
++
+
++            path_diana_eff = self._preprocess_diana()
+
++            path_jh_eff    = self._preprocess_pdc(self.file2_path.get(), label="JH")
+
++            path_eur_eff   = self._preprocess_pdc(self.file3_path.get(), label="EUR")
+
++
+
++            self._log("━" * 54, "section")
+
++            self._log(" PRÉTRAITEMENT TERMINÉ", "section")
+
++            self._log(f"  Diana : {os.path.basename(path_diana_eff)}", "ok")
+
++            self._log(f"  JH    : {os.path.basename(path_jh_eff)}", "ok")
+
++            self._log(f"  EUR   : {os.path.basename(path_eur_eff)}", "ok")
+
++            self._log("━" * 54, "section")
+
++
+
++            return path_diana_eff, path_jh_eff, path_eur_eff
+
+@@ -1499,0 +1524,8 @@
++            # FIX 1 — Indices constants déplacés AVANT la boucle :
+
++            # SRC_COLS.index() était recalculé à chaque itération (N fois inutilement)
+
++            idx_date_src   = SRC_COLS.index("Timesheet Entry Details Calendar Date")
+
++            idx_value_src  = SRC_COLS.index("Timesheet Entry Details Value")
+
++            idx_ufirst_src = SRC_COLS.index("User First Name")
+
++            idx_ulast_src  = SRC_COLS.index("User Last Name")
+
++            skip_src = {idx_date_src, idx_value_src, idx_ufirst_src, idx_ulast_src}
+
++
+
+@@ -1510,8 +1542,3 @@
+-                def fv(idx):
+
+-                    return fields[idx] if 0 <= idx < len(fields) else ""
+
+-
+
+-                idx_date_src   = SRC_COLS.index("Timesheet Entry Details Calendar Date")
+
+-                idx_value_src  = SRC_COLS.index("Timesheet Entry Details Value")
+
+-                idx_ufirst_src = SRC_COLS.index("User First Name")
+
+-                idx_ulast_src  = SRC_COLS.index("User Last Name")
+
+-                skip_src = {idx_date_src, idx_value_src, idx_ufirst_src, idx_ulast_src}
+
++                # fv() reste dans la boucle : capture `fields` qui change à chaque ligne
+
++                def fv(idx, _f=fields):
+
++                    return _f[idx] if 0 <= idx < len(_f) else ""
+
+@@ -1582 +1608,0 @@
+-            from collections import OrderedDict
+
+@@ -1794,2 +1820 @@
+-            from collections import OrderedDict as OD2
+
+-            agg2_diana = OD2()
+
++            agg2_diana = OrderedDict()
+
+@@ -1924 +1948,0 @@
+-            import traceback
+
+@@ -2140 +2163,0 @@
+-            import traceback
+
+@@ -2277 +2299,0 @@
+-            import traceback
+
+@@ -2496,0 +2519,5 @@
++
+
++                # FIX 3 — Collecte des messages de log produits dans le thread secondaire.
+
++                # Ils seront émis dans _done() qui s'exécute dans le thread principal
+
++                # via self.after(0, _done), garantissant la thread-safety Tkinter.
+
++                _pending_logs = []
+
+@@ -2498 +2525 @@
+-                    self._log(f"  ⚠  Dans CSV mais absents du PDC ({len(csv_only)}) :", "warn")
+
++                    _pending_logs.append((f"  ⚠  Dans CSV mais absents du PDC ({len(csv_only)}) :", "warn"))
+
+@@ -2500 +2527 @@
+-                        self._log(f"    • {name}", "warn")
+
++                        _pending_logs.append((f"    • {name}", "warn"))
+
+@@ -2502 +2529 @@
+-                    self._log("  ✔  Tous les intervenants CSV ont des données PDC.", "ok")
+
++                    _pending_logs.append(("  ✔  Tous les intervenants CSV ont des données PDC.", "ok"))
+
+@@ -2504 +2531 @@
+-                    self._log(f"  ⚠  Dans PDC mais absents du CSV ({len(pdc_only_list)}) — ajoutés en fin de combobox :", "warn")
+
++                    _pending_logs.append((f"  ⚠  Dans PDC mais absents du CSV ({len(pdc_only_list)}) — ajoutés en fin de combobox :", "warn"))
+
+@@ -2506 +2533 @@
+-                        self._log(f"    • {name}", "warn")
+
++                        _pending_logs.append((f"    • {name}", "warn"))
+
+@@ -2508 +2535 @@
+-                    self._log("  ✔  Tous les intervenants PDC sont dans le CSV.", "ok")
+
++                    _pending_logs.append(("  ✔  Tous les intervenants PDC sont dans le CSV.", "ok"))
+
+@@ -2550,0 +2578,5 @@
++                # FIX 1 — _fv défini en dehors de la boucle avec argument par défaut
+
++                # pour éviter la redéfinition de l'objet fonction à chaque itération
+
++                def _fv(i, _flds=None):
+
++                    return _flds[i] if _flds and 0 <= i < len(_flds) else ""
+
++
+
+@@ -2556 +2588 @@
+-                    def _fv(i): return flds[i] if 0 <= i < len(flds) else ""
+
++                    _fv = lambda i, _f=flds: _f[i] if 0 <= i < len(_f) else ""
+
+@@ -2586,3 +2618,2 @@
+-                import os as _os2
+
+-                path_histo = _os2.path.join(
+
+-                    _os2.path.dirname(_os2.path.abspath(__file__)),
+
++                path_histo = os.path.join(
+
++                    os.path.dirname(os.path.abspath(__file__)),
+
+@@ -2591 +2622 @@
+-                if HAS_OPENPYXL and _os2.path.isfile(path_histo):
+
++                if HAS_OPENPYXL and os.path.isfile(path_histo):
+
+@@ -2616,0 +2648,2 @@
++                # FIX 3 — _done() s'exécute dans le thread principal (via after),
+
++                # garantissant que tous les appels Tkinter sont thread-safe.
+
+@@ -2626,0 +2660,3 @@
++                    # FIX 3 — Émission des logs collectés dans le thread secondaire
+
++                    for msg, tag in _pending_logs:
+
++                        self._log(msg, tag)
+
+@@ -2639 +2674,0 @@
+-                import traceback
+
+@@ -2643 +2677,0 @@
+-        import threading
+
+@@ -3342,3 +3376,2 @@
+-        import os as _os
+
+-        self._log_path = _os.path.join(
+
+-            _os.path.dirname(_os.path.abspath(path_jh)),
+
++        self._log_path = os.path.join(
+
++            os.path.dirname(os.path.abspath(path_jh)),
+
+@@ -3570 +3602,0 @@
+-            import traceback as _tb
+
+@@ -3572 +3604 @@
+-            messagebox.showerror("Erreur chargement", _tb.format_exc(), parent=self)
+
++            messagebox.showerror("Erreur chargement", traceback.format_exc(), parent=self)
+

@@ -88,6 +88,56 @@ IHM de traitement des fichiers de saisie et plans de charges
     - ComboBox UserName : inclut désormais les ressources présentes dans le CSV PDC JH
       filtré mais absentes de intervenants.csv (ajoutées après les intervenants.csv)
 
+  v5.10 : toggle JH / TTNR dans les titres des cadrans gauches (PdcMajWindow)
+    - Cadran haut-gauche : [● Plan de charges JH] [○ Plan de charges TTNR]
+        Mode JH   → plan de charges JH de l'intervenant sélectionné (colonnes mois, inchangé)
+        Mode TTNR → atterrissage EUR de l'intervenant sélectionné par projet
+    - Cadran bas-gauche  : [○ Plan de charges JH] [● Plan de charges TTNR]
+        Toggle bascule simultanément bas-gauche ET bas-droite
+        Mode TTNR → atterrissage EUR tous intervenants par projet (inchangé)
+        Mode JH   → Consommé JH / RAF JH / Atterrissage JH agrégés tous intervenants
+    - Cadran bas-droite : se synchronise sur le toggle bas
+
+  v5.11 : mises en forme + corrections écran MAJ Plan de charges
+    - Suppression du bouton Rafraîchir
+    - Bandeau UserName/ComboBox : fond gris clair (BG_MAIN) au lieu de blanc
+    - ComboBox UserName : fond blanc
+    - En-têtes tableaux : couleur identique au bandeau titre (CA_GREEN)
+    - Corps des tableaux : textes en noir (#000000) sauf colonnes mois écoulés cadran haut
+    - Sélection projet (cadran bas-gauche) : surbrillance vert clair (#c8e6c9)
+    - Bascule TTNR/JH cadran bas : projet sélectionné conservé + détail rechargé dans le nouveau mode
+    - Cadran haut TTNR : restructuré avec 12 mois + Total (même structure que JH)
+      Passé = diana_eur (réel TJM×JH), Futur = cache_eur_detail (RAF PDC EUR)
+    - Contrôle TJM manquant dans Histo_TJM.xlsx : log ⚠ par intervenant + mois concernés
+        Mode TTNR → détail EUR par intervenant pour le projet sélectionné (inchangé)
+        Mode JH   → détail JH par intervenant pour le projet sélectionné (nouveau)
+        Si aucun projet sélectionné : tableau vide, basculement sans effet
+
+  v5.04 : charte CA appliquée à la fenêtre Plan de charges (PdcMajWindow)
+    - Bandeau titre : CA_GREEN pleine largeur, texte blanc (même style fenêtre principale)
+    - En-têtes tableaux C_HDR : "#1e3a5f" (bleu) → CA_GREEN_HOV, texte blanc
+    - Lignes alternées "#1a2530" (bleu sombre) → BG_CARD (neutre thème)
+    - Titres de cadrans et libellés structurels : fg=CA_GREEN
+    - Bouton "Rafraîchir" : style="ca"
+
+  v5.03 : charte couleurs Crédit Agricole sur le bandeau et les boutons principaux
+    - CA_GREEN = "#007461" / CA_GREEN_HOV = "#075144" (couleurs officielles CA)
+    - Bandeau titre pleine largeur fond vert, texte blanc
+    - Boutons "Suivi Conso" et "Générer Histo TJM" : style "ca" (fond CA_GREEN)
+    - Nouveau style "ca" dans make_button (indépendant du thème)
+
+  v5.02 : charte typographique Crédit Agricole sur toute l'IHM
+    - Titres/en-têtes  : Montserrat (remplace Consolas bold)
+    - Corps/libellés   : Open Sans  (remplace Consolas normal)
+    - Logs/tableaux    : Courier New conservé (contenu monospace)
+    - Nouvelles constantes FONT_SMALL_BOLD et FONT_BODY_BOLD
+    - Toutes les polices Consolas en dur remplacées par les constantes
+
+  v5.01 : police Open Sans pour les onglets
+    - FONT_TAB_UNSEL = ("Open Sans", 9) — police CA-CIB pour tous les onglets
+    - Onglet non sélectionné : Open Sans 9, couleur TEXT_SEC
+    - Onglet sélectionné    : Open Sans 9, couleur noire (#000000)
+
   v5.00 : corrections issues de l'audit qualité (3 priorités critiques)
     - FIX 1 — Performance boucle Diana (_process_file1) :
         idx_date_src, idx_value_src, idx_ufirst_src, idx_ulast_src et skip_src
@@ -103,7 +153,7 @@ IHM de traitement des fichiers de saisie et plans de charges
         dans le thread principal via self.after(0, _done).
 """
 
-VERSION = "5.00"
+VERSION = "5.13"
 
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, scrolledtext
@@ -223,6 +273,9 @@ THEMES = {
     },
 }
 
+CA_GREEN     = "#007461"   # vert bouton Crédit Agricole (brand primary)
+CA_GREEN_HOV = "#075144"   # vert hover Crédit Agricole
+
 def _apply_theme(name):
     theme = THEMES.get(name, THEMES["dark"])
     globals().update(theme)
@@ -233,11 +286,14 @@ _parser.add_argument("--style", choices=["dark", "light", "blue"], default="dark
 _args, _ = _parser.parse_known_args()
 _apply_theme(_args.style)
 
-FONT_TITLE = ("Consolas", 18, "bold")
-FONT_HEAD  = ("Consolas", 11, "bold")
-FONT_BODY  = ("Consolas", 10)
-FONT_SMALL = ("Consolas", 9)
-FONT_MONO  = ("Courier New", 9)
+FONT_TITLE     = ("Montserrat", 18, "bold")
+FONT_HEAD      = ("Montserrat", 11, "bold")
+FONT_BODY      = ("Open Sans", 10)
+FONT_BODY_BOLD = ("Open Sans", 10, "bold")
+FONT_SMALL     = ("Open Sans", 9)
+FONT_SMALL_BOLD = ("Open Sans", 9, "bold")
+FONT_MONO      = ("Courier New", 9)
+FONT_TAB_UNSEL = ("Open Sans", 9)
 
 
 def _calc_jours_ouvres(annee):
@@ -381,17 +437,21 @@ def _load_nucleus_exclusions(path):
 
 
 def make_button(parent, text, command, style="neutral", width=None):
-    bg  = BTN_ACT  if style == "action" else BTN_NEU
-    fg  = "#ffffff" if style == "action" else TEXT_PRI
+    if style == "ca":
+        bg, fg, hov = CA_GREEN_HOV, "#ffffff", CA_GREEN
+    elif style == "action":
+        bg, fg, hov = BTN_ACT, "#ffffff", BTN_ACT_H
+    else:
+        bg, fg, hov = BTN_NEU, TEXT_PRI, BTN_NEU_H
     kw  = dict(text=text, command=command, bg=bg, fg=fg,
                font=FONT_HEAD, bd=0, padx=14, pady=8,
-               relief="flat", cursor="hand2", activeforeground="#ffffff")
+               relief="flat", cursor="hand2",
+               activebackground=hov, activeforeground="#ffffff")
     if width:
         kw["width"] = width
     btn = tk.Button(parent, **kw)
-    hov = BTN_ACT_H if style == "action" else BTN_NEU_H
-    btn.bind("<Enter>", lambda e: btn.config(bg=hov))
-    btn.bind("<Leave>", lambda e: btn.config(bg=bg))
+    btn.bind("<Enter>", lambda e, c=hov: btn.config(bg=c))
+    btn.bind("<Leave>", lambda e, c=bg:  btn.config(bg=c))
     return btn
 
 
@@ -445,11 +505,12 @@ class SuiviConsoApp(tk.Tk):
 
     # ── Interface ────────────────────────────────────────────────────────
     def _build_ui(self):
-        hdr = tk.Frame(self, bg=BG_MAIN, pady=16)
-        hdr.pack(fill="x", padx=24)
+        hdr = tk.Frame(self, bg=CA_GREEN, pady=16)
+        hdr.pack(fill="x")
         tk.Label(hdr, text="⬡  SUIVI CONSOMMATION DSI",
-                 bg=BG_MAIN, fg=ACCENT, font=FONT_TITLE).pack(side="left")
-        tk.Label(hdr, text=f"v{VERSION}", bg=BG_MAIN, fg=TEXT_SEC,
+                 bg=CA_GREEN, fg="#ffffff", font=FONT_TITLE,
+                 padx=24).pack(side="left")
+        tk.Label(hdr, text=f"v{VERSION}", bg=CA_GREEN, fg="#ffffff",
                  font=FONT_SMALL).pack(side="left", padx=8, pady=4, anchor="s")
         tk.Frame(self, bg=BORDER, height=1).pack(fill="x")
 
@@ -522,12 +583,12 @@ class SuiviConsoApp(tk.Tk):
 
         self.btn_suivi = make_button(bf, "▶  Suivi Conso",
                                      self._run_suivi_conso,
-                                     style="action", width=22)
+                                     style="ca", width=22)
         self.btn_suivi.pack(fill="x")
 
         self.btn_tjm = make_button(bf, "📊  Générer Histo TJM",
                                    self._run_histo_tjm,
-                                   style="action", width=22)
+                                   style="ca", width=22)
         self.btn_tjm.pack(fill="x", pady=(8, 0))
 
         self.btn_crapull = make_button(bf, "🔍  Vérif. données Crapull",
@@ -559,7 +620,7 @@ class SuiviConsoApp(tk.Tk):
         top = tk.Frame(card, bg=BG_CARD)
         top.pack(fill="x")
         tk.Label(top, text=f" {num} ", bg=ACCENT2, fg="#ffffff",
-                 font=("Consolas", 9, "bold")).pack(side="left", padx=(0, 6))
+                 font=FONT_SMALL_BOLD).pack(side="left", padx=(0, 6))
         tk.Label(top, text=label, bg=BG_CARD, fg=TEXT_PRI,
                  font=FONT_BODY).pack(side="left")
         tk.Label(card, text=hint, bg=BG_CARD, fg=TEXT_SEC,
@@ -582,11 +643,12 @@ class SuiviConsoApp(tk.Tk):
         sty.theme_use("default")
         sty.configure("DSI.TNotebook", background=BG_PANEL, borderwidth=0)
         sty.configure("DSI.TNotebook.Tab", background=BG_ENTRY,
-                      foreground=TEXT_SEC, font=FONT_SMALL,
+                      foreground=TEXT_SEC, font=FONT_TAB_UNSEL,
                       padding=[10, 4], borderwidth=0)
         sty.map("DSI.TNotebook.Tab",
                 background=[("selected", BG_CARD)],
-                foreground=[("selected", TEXT_PRI)])
+                foreground=[("selected", "#000000")],
+                font=[("selected", FONT_TAB_UNSEL)])
 
         nb = ttk.Notebook(parent, style="DSI.TNotebook")
         nb.pack(fill="both", expand=True, padx=10, pady=(0, 10))
@@ -669,7 +731,7 @@ class SuiviConsoApp(tk.Tk):
                               font=FONT_SMALL)
         style_inco.configure("Inco.Treeview.Heading",
                               background=BG_ENTRY, foreground=ACCENT2,
-                              font=("Consolas", 9, "bold"))
+                              font=FONT_SMALL_BOLD)
         self.inco_tree.config(style="Inco.Treeview")
         for col, (head, width) in headers_inco.items():
             self.inco_tree.heading(col, text=head)
@@ -684,7 +746,7 @@ class SuiviConsoApp(tk.Tk):
         self.log_box.tag_config("warn",    foreground=WARN)
         self.log_box.tag_config("error",   foreground="#f85149")
         self.log_box.tag_config("section", foreground=ACCENT2,
-                                font=("Consolas", 10, "bold"))
+                                font=FONT_BODY_BOLD)
 
     # ── Navigateurs fichiers ──────────────────────────────────────────────
     def _preselectfile1(self):
@@ -2591,7 +2653,8 @@ class SuiviConsoApp(tk.Tk):
                 HDR_DATE   = "Timesheet Entry Details Calendar Date"
                 HDR_VAL    = "Timesheet Entry Details Value"
 
-                diana_jh = {}
+                diana_jh     = {}
+                norm_to_orig = {}   # u_norm → u_orig (pour les logs TJM manquants)
 
                 with open(path_diana_eff, "r", encoding="utf-8-sig", errors="replace") as f:
                     d_lines = f.readlines()
@@ -2640,17 +2703,20 @@ class SuiviConsoApp(tk.Tk):
                     try: jh_v = float(_fv(di_vl).replace(",","."))
                     except: pass
 
-                    if u_norm not in diana_jh: diana_jh[u_norm] = {}
+                    if u_norm not in diana_jh:
+                        diana_jh[u_norm]     = {}
+                        norm_to_orig[u_norm] = u_orig   # 1ère occurrence suffit
                     if pc_v not in diana_jh[u_norm]:
                         diana_jh[u_norm][pc_v] = {}
                     diana_jh[u_norm][pc_v][m_v] = diana_jh[u_norm][pc_v].get(m_v, 0.0) + jh_v
 
                 # ── Histo_TJM ─────────────────────────────────────────────────
-                path_histo = os.path.join(
+                path_histo      = os.path.join(
                     os.path.dirname(os.path.abspath(__file__)),
                     "Histo_TJM.xlsx")
-                histo_tjm = {}
-                if HAS_OPENPYXL and os.path.isfile(path_histo):
+                histo_tjm       = {}
+                histo_tjm_found = os.path.isfile(path_histo)
+                if HAS_OPENPYXL and histo_tjm_found:
                     wb_h = openpyxl.load_workbook(path_histo, read_only=True, data_only=True)
                     ws_h = wb_h.active
                     for ri, row in enumerate(ws_h.iter_rows(values_only=True)):
@@ -2664,16 +2730,58 @@ class SuiviConsoApp(tk.Tk):
                     wb_h.close()
 
                 # ── EUR Diana (JH × TJM) ──────────────────────────────────────
-                diana_eur = {}
+                diana_eur    = {}
+                tjm_manquants = {}   # {u_norm: set(mois)} — TJM absent pour JH > 0
+
                 for u_norm, prj_dict in diana_jh.items():
                     for prj, mois_dict in prj_dict.items():
                         for mois, jh_v in mois_dict.items():
+                            if not jh_v:
+                                continue
                             tjm = histo_tjm.get((u_norm, mois))
-                            if tjm and jh_v:
+                            if tjm:
                                 eur_v = round(jh_v * tjm, 2)
                                 if u_norm not in diana_eur: diana_eur[u_norm] = {}
                                 if prj not in diana_eur[u_norm]: diana_eur[u_norm][prj] = {}
                                 diana_eur[u_norm][prj][mois] = eur_v
+                            else:
+                                # TJM manquant : consommé EUR non calculable
+                                tjm_manquants.setdefault(u_norm, set()).add(mois)
+
+                # ── Log TJM manquants ──────────────────────────────────────────
+                _pending_logs.append(("━" * 54, "section"))
+                if not histo_tjm_found:
+                    # Fichier absent : un seul avertissement global, pas de détail par intervenant
+                    _pending_logs.append((
+                        f"  ⚠  Histo_TJM.xlsx introuvable — consommé EUR Diana "
+                        f"non calculé pour tous les intervenants.", "warn"))
+                    _pending_logs.append((
+                        f"  → Chemin recherché : {path_histo}", "warn"))
+                    _pending_logs.append((
+                        "  → Générer d'abord le fichier via le bouton "
+                        "\"Générer Histo TJM\".", "warn"))
+                elif tjm_manquants:
+                    # Fichier présent mais des TJM sont absents pour certains intervenants/mois
+                    _pending_logs.append((f"  Histo_TJM utilisé : {path_histo}", "info"))
+                    _pending_logs.append((
+                        f"  ⚠  TJM manquant(s) dans Histo_TJM.xlsx "
+                        f"— consommé EUR Diana non calculé "
+                        f"({len(tjm_manquants)} intervenant(s)) :", "warn"))
+                    for u_norm in sorted(tjm_manquants):
+                        u_disp    = norm_to_orig.get(u_norm, u_norm)
+                        mois_list = sorted(tjm_manquants[u_norm])
+                        mois_str  = ", ".join(MOIS_ABBREV[m - 1] for m in mois_list)
+                        _pending_logs.append((
+                            f"    • {u_disp} : {mois_str}", "warn"))
+                    _pending_logs.append((
+                        "  → Ajouter ces intervenants / mois dans Histo_TJM.xlsx "
+                        "pour obtenir le consommé EUR.", "warn"))
+                else:
+                    # Tout est OK
+                    _pending_logs.append((f"  Histo_TJM utilisé : {path_histo}", "info"))
+                    _pending_logs.append((
+                        "  ✔  TJM disponible pour tous les intervenants Diana "
+                        "(consommé EUR calculé).", "ok"))
 
                 # ── Mise à jour thread principal ──────────────────────────────
                 # FIX 3 — _done() s'exécute dans le thread principal (via after),
@@ -3010,7 +3118,7 @@ class CrapullWindow(tk.Toplevel):
                          font=FONT_SMALL)
         style.configure("Dark.Treeview.Heading",
                          background=BG_ENTRY, foreground=ACCENT2,
-                         font=("Consolas", 9, "bold"))
+                         font=FONT_SMALL_BOLD)
         style.map("Dark.Treeview",
                   background=[("selected", ACCENT2)],
                   foreground=[("selected", "#000000")])
@@ -3290,7 +3398,7 @@ class DianaWindow(tk.Toplevel):
                          fieldbackground=BG_CARD, rowheight=22, font=FONT_SMALL)
         style.configure("Diana.Treeview.Heading",
                          background=BG_ENTRY, foreground=ACCENT2,
-                         font=("Consolas", 9, "bold"))
+                         font=FONT_SMALL_BOLD)
         style.map("Diana.Treeview",
                   background=[("selected", ACCENT2)],
                   foreground=[("selected", "#000000")])
@@ -3404,6 +3512,13 @@ class PdcMajWindow(tk.Toplevel):
         self._histo_tjm          = histo_tjm or {}
         self._nucleus_exclusions = nucleus_exclusions or set()
         self._nucleus_only_var   = tk.BooleanVar(value=False)
+        self._top_mode = "JH"    # "JH" | "TTNR"  — toggle cadran haut-gauche
+        self._bot_mode = "TTNR"  # "JH" | "TTNR"  — toggle cadran bas (gauche+droite)
+        # État de tri par tableau : {"jh": ("col_key", "asc"|"desc"), ...}
+        # col_key : "code" | "lib" | 1..12 | "total"
+        self._sort_state = {}    # clé : "jh" | "ttnr" | "eur" | "jh_global"
+        self._update_top_toggle  = None   # callable(mode) — rafraîchit l'apparence du toggle haut
+        self._update_bot_toggle  = None   # callable(mode) — rafraîchit l'apparence du toggle bas
         self._log_path = os.path.join(
             os.path.dirname(os.path.abspath(path_jh)),
             "Modifs_plan_de_charge.log")
@@ -3559,9 +3674,10 @@ class PdcMajWindow(tk.Toplevel):
 
     def _load_data(self):
         if self._cache_ready and self._cache_usernames:
-            self._cb_interv["values"] = self._cache_usernames
-            if self._cache_usernames:
-                self._interv_var.set(self._cache_usernames[0])
+            _sorted = sorted(self._cache_usernames, key=_norm_name) + ["Tous"]
+            self._cb_interv["values"] = _sorted
+            if _sorted:
+                self._interv_var.set(_sorted[0])
                 self._refresh_tables()
             self._status.set(
                 f"Cache utilisé — {len(self._cache_usernames)} username(s) RGU")
@@ -3625,9 +3741,10 @@ class PdcMajWindow(tk.Toplevel):
                 msg = (f"⚠ Colonne '{RESP_COL}' introuvable — "
                        f"{len(intervenants)} intervenant(s) sans filtre. "
                        f"Colonnes : {cols_jh[:8]}")
-            self._cb_interv["values"] = intervenants
-            if intervenants:
-                self._interv_var.set(intervenants[0])
+            intervenants_with_tous = intervenants + ["Tous"]
+            self._cb_interv["values"] = intervenants_with_tous
+            if intervenants_with_tous:
+                self._interv_var.set(intervenants_with_tous[0])
                 self._refresh_tables()
             self._status.set(msg)
         except Exception as e:
@@ -3661,14 +3778,61 @@ class PdcMajWindow(tk.Toplevel):
             return
         self._modifs.clear()
         self._added_rows.clear()
-        self._build_table_jh(interv)
-        self._build_table_eur(interv)
+        if self._top_mode == "JH":
+            self._build_table_jh(interv)
+        else:
+            self._build_table_ttnr_interv(interv)
+        if self._bot_mode == "TTNR":
+            self._build_table_eur(interv)
+        else:
+            self._build_table_jh_global()
         self._build_ecart_list()
+
+    def _on_interv_change(self, *_):
+        """Rappelé au changement d'intervenant via la ComboBox.
+        Rafraîchit uniquement le cadran haut — le cadran bas, la sélection
+        projet et le tableau de détail sont conservés intacts."""
+        interv = self._interv_var.get()
+        if not interv:
+            return
+        if not self._cache_ready and self._df_jh is None:
+            return
+        self._modifs.clear()
+        self._added_rows.clear()
+        if self._top_mode == "JH":
+            self._build_table_jh(interv)
+        else:
+            self._build_table_ttnr_interv(interv)
 
     def _get_jh_data(self, interv):
         if self._cache_ready:
+            mois_cur = self._mois_cur
+
+            if interv == "Tous":
+                result = {}
+                # Mois passés : diana_jh agrégé tous intervenants
+                for u_norm, diana_data in self._diana_jh.items():
+                    for prj, prj_data in diana_data.items():
+                        if prj in EXCLUDED_PROJECTS:
+                            continue
+                        if prj not in result:
+                            result[prj] = {"_lib": ""}
+                        for m in range(1, mois_cur):
+                            result[prj][m] = result[prj].get(m, 0.0) + prj_data.get(m, 0.0)
+                # Mois futurs : cache_jh agrégé tous intervenants
+                for u_norm, pdc_data in self._cache_jh.items():
+                    for prj, prj_data in pdc_data.items():
+                        if prj in EXCLUDED_PROJECTS:
+                            continue
+                        if prj not in result:
+                            result[prj] = {"_lib": prj_data.get("_lib", "")}
+                        elif not result[prj].get("_lib"):
+                            result[prj]["_lib"] = prj_data.get("_lib", "")
+                        for m in range(mois_cur, 13):
+                            result[prj][m] = result[prj].get(m, 0.0) + prj_data.get(m, 0.0)
+                return result
+
             interv_norm = _norm_name(interv)
-            mois_cur    = self._mois_cur
             pdc_data    = self._cache_jh.get(interv_norm, {})
             diana_data  = self._diana_jh.get(interv_norm, {})
 
@@ -3783,28 +3947,42 @@ class PdcMajWindow(tk.Toplevel):
             if has_ecart_fut:
                 ecarts.append((u_orig, ecart_total))
 
-        C_HDR    = "#1e3a5f"
-        W_INTERV = 31
+        C_HDR    = CA_GREEN
+        W_INTERV = 28
         W_ECART  = 10
 
-        tk.Label(self._frame_ecart, text="Intervenant", bg=C_HDR, fg=ACCENT2,
-                 font=("Consolas", 9, "bold"), width=W_INTERV,
-                 anchor="w", relief="flat", bd=1).grid(
-            row=0, column=0, sticky="ew", padx=1, pady=1)
-        tk.Label(self._frame_ecart, text="Écart JH", bg=C_HDR, fg=ACCENT2,
-                 font=("Consolas", 9, "bold"), width=W_ECART,
-                 anchor="e", relief="flat", bd=1).grid(
-            row=0, column=1, sticky="ew", padx=1, pady=1)
+        # ── Tri ───────────────────────────────────────────────────────────
+        col_e, dir_e = self._sort_state.get("ecart", ("interv", "asc"))
+        rev_e = (dir_e == "desc")
+        if col_e == "ecart":
+            ecarts.sort(key=lambda x: x[1], reverse=rev_e)
+        else:
+            ecarts.sort(key=lambda x: _norm_name(x[0]), reverse=rev_e)
+
+        # ── En-têtes cliquables ───────────────────────────────────────────
+        for col_key, txt, col, w, anc in [
+            ("interv", "Intervenant", 0, W_INTERV, "w"),
+            ("ecart",  "Écart JH",   1, W_ECART,  "e"),
+        ]:
+            lbl = tk.Label(self._frame_ecart,
+                           text=self._sort_indicator("ecart", col_key, txt),
+                           bg=C_HDR, fg="#ffffff", font=FONT_SMALL_BOLD,
+                           width=w, anchor=anc, relief="flat", bd=1,
+                           cursor="hand2")
+            lbl.grid(row=0, column=col, sticky="ew", padx=1, pady=1)
+            lbl.bind("<Button-1>",
+                     lambda e, ck=col_key: self._on_sort(
+                         "ecart", ck, self._build_ecart_list))
 
         self._ecart_usernames = []
         for i, (u_orig, ecart) in enumerate(ecarts, start=1):
-            bg_r  = "#1a2530" if i % 2 == 0 else BG_CARD
+            bg_r  = "#ffffff" if i % 2 == 0 else "#F4F4F4"
             sign  = "+" if ecart > 0 else ""
             e_str = f"{sign}{round(ecart)}"
             fg_e  = WARN if ecart > 0.01 else (ACCENT if ecart < -0.01 else TEXT_PRI)
 
             lbl_n = tk.Label(self._frame_ecart, text=u_orig[:W_INTERV],
-                             bg=bg_r, fg=TEXT_PRI, font=FONT_SMALL,
+                             bg=bg_r, fg="#001a33", font=FONT_SMALL,
                              width=W_INTERV, anchor="w")
             lbl_n.grid(row=i, column=0, sticky="ew", padx=1, pady=1)
             lbl_e = tk.Label(self._frame_ecart, text=e_str,
@@ -3826,6 +4004,31 @@ class PdcMajWindow(tk.Toplevel):
     def _sync_ecart_height(self):
         pass
 
+    # ── Helpers tri ─────────────────────────────────────────────────────────
+    def _on_sort(self, table_key, col_key, rebuild_fn):
+        """Inverse le sens de tri si même colonne, sinon repart en 'asc'."""
+        cur_col, cur_dir = self._sort_state.get(table_key, (None, None))
+        if cur_col == col_key:
+            new_dir = "desc" if cur_dir == "asc" else "asc"
+        else:
+            new_dir = "asc"
+        self._sort_state[table_key] = (col_key, new_dir)
+        rebuild_fn()
+
+    def _sort_indicator(self, table_key, col_key, label):
+        """Retourne le libellé avec indicateur ▲/▼ si colonne active."""
+        cur_col, cur_dir = self._sort_state.get(table_key, (None, None))
+        if cur_col == col_key:
+            return f"{label} {'▲' if cur_dir == 'asc' else '▼'}"
+        return label
+
+    def _apply_sort(self, table_key, projs, data_fn, default_key="code"):
+        """Trie la liste projs selon l'état de tri du tableau.
+        data_fn(pc, col_key) → valeur comparable (float ou str)."""
+        col_key, direction = self._sort_state.get(table_key, (default_key, "asc"))
+        reverse = (direction == "desc")
+        return sorted(projs, key=lambda pc: data_fn(pc, col_key), reverse=reverse)
+
     def _build_table_jh(self, interv):
         for w in self._frame_jh.winfo_children():
             w.destroy()
@@ -3834,37 +4037,54 @@ class PdcMajWindow(tk.Toplevel):
         data  = self._get_jh_data(interv)
         now_m = self._mois_cur
 
-        C_HDR    = "#1e3a5f"
-        C_PAST   = "#2a3a2a"
-        C_PAST_H = "#d4e8c2"
+        C_HDR    = CA_GREEN
+        C_PAST   = "#c8e6c9"
+        C_PAST_H = "#2e5c2e"
         C_OVER   = "#f0883e"
 
         JOURS_OUVRES = _calc_jours_ouvres(self._annee)
 
-        tk.Label(self._frame_jh, text="Project Code", bg=C_HDR, fg=ACCENT2,
-                 font=("Consolas", 9, "bold"), width=12, anchor="w",
-                 relief="flat", bd=1).grid(row=0, column=0, sticky="ew", padx=1, pady=1)
-        tk.Label(self._frame_jh, text="Project Name", bg=C_HDR, fg=ACCENT2,
-                 font=("Consolas", 9, "bold"), width=34, anchor="w",
-                 relief="flat", bd=1).grid(row=0, column=1, sticky="ew", padx=1, pady=1)
-        for m in range(1, 13):
-            bg_h = C_PAST if m < now_m else C_HDR
-            fg_h = C_PAST_H if m < now_m else ACCENT2
-            tk.Label(self._frame_jh, text=MOIS_ABBREV[m-1], bg=bg_h, fg=fg_h,
-                     font=("Consolas", 9, "bold"), width=6, anchor="center",
-                     relief="flat", bd=1).grid(row=0, column=m+1, sticky="ew", padx=1, pady=1)
-        tk.Label(self._frame_jh, text="Total", bg=C_HDR, fg=ACCENT2,
-                 font=("Consolas", 9, "bold"), width=7, anchor="center",
-                 relief="flat", bd=1).grid(row=0, column=14, sticky="ew", padx=1, pady=1)
-
-        projs = sorted(data.keys())
-        self._proj_rows = projs[:]
-
+        # ── Lib map (nécessaire avant le tri par libellé) ─────────────────
         lib_map = {}
         if self._cache_ready:
-            interv_norm = _norm_name(interv)
-            for pc2, prj_dict in self._cache_jh.get(interv_norm, {}).items():
+            interv_norm = _norm_name(interv) if interv != "Tous" else None
+            src = self._cache_jh.get(interv_norm, {}) if interv_norm else {}
+            for pc2, prj_dict in src.items():
                 lib_map[pc2] = prj_dict.get("_lib", prj_dict.get("_libelle", ""))
+            if interv == "Tous":
+                for pd2 in self._cache_jh.values():
+                    for pc2, prj_dict in pd2.items():
+                        if pc2 not in lib_map and isinstance(prj_dict, dict):
+                            lib_map[pc2] = prj_dict.get("_lib", "")
+
+        def _jh_sort_val(pc, col_key):
+            if col_key == "code":  return pc
+            if col_key == "lib":   return lib_map.get(pc, data[pc].get("_lib", "")).lower()
+            if col_key == "total": return sum(data[pc].get(m, 0.0) for m in range(1, 13))
+            return data[pc].get(col_key, 0.0)  # col_key = mois 1..12
+
+        projs = self._apply_sort("jh", list(data.keys()), _jh_sort_val, default_key="code")
+        self._proj_rows = projs[:]
+
+        # ── En-têtes cliquables ───────────────────────────────────────────
+        def _jh_hdr(text, col_key, col, width, anchor="w", bg=C_HDR, fg="#ffffff"):
+            lbl = tk.Label(self._frame_jh,
+                           text=self._sort_indicator("jh", col_key, text),
+                           bg=bg, fg=fg, font=FONT_SMALL_BOLD,
+                           width=width, anchor=anchor,
+                           relief="flat", bd=1, cursor="hand2")
+            lbl.grid(row=0, column=col, sticky="ew", padx=1, pady=1)
+            lbl.bind("<Button-1>",
+                     lambda e, ck=col_key: self._on_sort(
+                         "jh", ck, lambda: self._build_table_jh(interv)))
+
+        _jh_hdr("Project Code", "code",  0,  12, anchor="w")
+        _jh_hdr("Project Name", "lib",   1,  30, anchor="w")
+        for m in range(1, 13):
+            bg_h = C_PAST if m < now_m else C_HDR
+            fg_h = C_PAST_H if m < now_m else "#ffffff"
+            _jh_hdr(MOIS_ABBREV[m-1], m, m+1, 7, anchor="center", bg=bg_h, fg=fg_h)
+        _jh_hdr("Total", "total", 14, 11, anchor="center")
 
         for ri, pc in enumerate(projs, start=1):
             info = data[pc]
@@ -3874,12 +4094,12 @@ class PdcMajWindow(tk.Toplevel):
                     for u_norm, pd2 in self._cache_jh.items():
                         if pc in pd2 and pd2[pc].get("_lib"):
                             lib = pd2[pc]["_lib"]; break
-            bg_r = "#1a2530" if ri % 2 == 0 else BG_CARD
-            tk.Label(self._frame_jh, text=pc, bg=bg_r, fg=TEXT_PRI,
+            bg_r = "#ffffff" if ri % 2 == 0 else "#F4F4F4"
+            tk.Label(self._frame_jh, text=pc, bg=bg_r, fg="#000000",
                      font=FONT_SMALL, width=12, anchor="w").grid(
                 row=ri, column=0, sticky="ew", padx=1, pady=1)
-            tk.Label(self._frame_jh, text=lib[:40], bg=bg_r, fg=TEXT_SEC,
-                     font=FONT_SMALL, width=34, anchor="w").grid(
+            tk.Label(self._frame_jh, text=lib[:36], bg=bg_r, fg="#000000",
+                     font=FONT_SMALL, width=30, anchor="w").grid(
                 row=ri, column=1, sticky="ew", padx=1, pady=1)
             row_total = 0.0
             for m in range(1, 13):
@@ -3887,13 +4107,13 @@ class PdcMajWindow(tk.Toplevel):
                 row_total += val
                 editable = (m < now_m)
                 bg_c = C_PAST if m < now_m else bg_r
-                fg_c = C_PAST_H if m < now_m else TEXT_PRI
+                fg_c = C_PAST_H if m < now_m else "#000000"
                 disp = str(int(val)) if val == int(val) else f"{val:.1f}"
                 if editable:
                     var = tk.StringVar(value=disp)
                     e = tk.Entry(self._frame_jh, textvariable=var,
                                  bg=bg_c, fg=fg_c, font=FONT_SMALL,
-                                 width=6, justify="center", bd=0,
+                                 width=7, justify="center", bd=0,
                                  insertbackground=ACCENT,
                                  relief="flat",
                                  highlightbackground=BORDER,
@@ -3906,17 +4126,18 @@ class PdcMajWindow(tk.Toplevel):
                 else:
                     tk.Label(self._frame_jh, text=disp if val else "",
                              bg=bg_c, fg=fg_c, font=FONT_SMALL,
-                             width=6, anchor="center").grid(
+                             width=7, anchor="center").grid(
                         row=ri, column=m+1, sticky="ew", padx=1, pady=1)
             tot_disp = str(int(row_total)) if row_total == int(row_total) else f"{row_total:.1f}"
-            tk.Label(self._frame_jh, text=tot_disp, bg=bg_r, fg=ACCENT2,
-                     font=("Consolas", 9, "bold"), width=7, anchor="center").grid(
+            tk.Label(self._frame_jh, text=tot_disp, bg=bg_r, fg="#000000",
+                     font=FONT_SMALL_BOLD, width=11, anchor="center").grid(
                 row=ri, column=14, sticky="ew", padx=1, pady=1)
 
         n_rows  = len(projs)
         tot_row = n_rows + 1
-        tk.Label(self._frame_jh, text="Total", bg=C_HDR, fg=ACCENT2,
-                 font=("Consolas", 9, "bold"), width=12, anchor="e").grid(
+        C_TOT = "#F7F7F7"
+        tk.Label(self._frame_jh, text="Total", bg=C_TOT, fg="#001a33",
+                 font=FONT_SMALL_BOLD, width=12, anchor="e").grid(
             row=tot_row, column=0, columnspan=2, sticky="ew", padx=1, pady=1)
         grand_total = 0.0
         for m in range(1, 13):
@@ -3924,33 +4145,34 @@ class PdcMajWindow(tk.Toplevel):
             grand_total += col_tot
             jo   = JOURS_OUVRES[m-1]
             over = abs(col_tot - jo) > 0.01 and m >= now_m
-            bg_t = C_PAST if m < now_m else (C_OVER if over else C_HDR)
-            fg_t = "#1a1a1a" if over else (C_PAST_H if m < now_m else ACCENT2)
+            bg_t = C_PAST if m < now_m else (C_OVER if over else C_TOT)
+            fg_t = "#000000" if over else (C_PAST_H if m < now_m else "#000000")
             disp = str(int(col_tot)) if col_tot == int(col_tot) else f"{col_tot:.1f}"
             tk.Label(self._frame_jh, text=disp if col_tot else "",
                      bg=bg_t, fg=fg_t,
-                     font=("Consolas", 9, "bold"), width=6, anchor="center").grid(
+                     font=FONT_SMALL_BOLD, width=7, anchor="center").grid(
                 row=tot_row, column=m+1, sticky="ew", padx=1, pady=1)
         gt = str(int(grand_total)) if grand_total == int(grand_total) else f"{grand_total:.1f}"
-        tk.Label(self._frame_jh, text=gt, bg=C_HDR, fg=ACCENT2,
-                 font=("Consolas", 9, "bold"), width=7, anchor="center").grid(
+        tk.Label(self._frame_jh, text=gt, bg=C_TOT, fg="#000000",
+                 font=FONT_SMALL_BOLD, width=11, anchor="center").grid(
             row=tot_row, column=14, sticky="ew", padx=1, pady=1)
 
-        jo_row = tot_row + 1
-        tk.Label(self._frame_jh, text="Jours ouvrés", bg=BG_PANEL, fg=TEXT_SEC,
-                 font=FONT_SMALL, width=12, anchor="e").grid(
-            row=jo_row, column=0, columnspan=2, sticky="ew", padx=1, pady=1)
-        jo_total = 0
-        for m in range(1, 13):
-            jo = JOURS_OUVRES[m-1]
-            jo_total += jo
-            bg_j = C_PAST if m < now_m else BG_PANEL
-            tk.Label(self._frame_jh, text=str(jo), bg=bg_j, fg=TEXT_SEC,
-                     font=FONT_SMALL, width=6, anchor="center").grid(
-                row=jo_row, column=m+1, sticky="ew", padx=1, pady=1)
-        tk.Label(self._frame_jh, text=str(jo_total), bg=BG_PANEL, fg=TEXT_SEC,
-                 font=FONT_SMALL, width=7, anchor="center").grid(
-            row=jo_row, column=14, sticky="ew", padx=1, pady=1)
+        if interv != "Tous":
+            jo_row = tot_row + 1
+            tk.Label(self._frame_jh, text="Jours ouvrés", bg=C_TOT, fg=TEXT_SEC,
+                     font=FONT_SMALL, width=12, anchor="e").grid(
+                row=jo_row, column=0, columnspan=2, sticky="ew", padx=1, pady=1)
+            jo_total = 0
+            for m in range(1, 13):
+                jo = JOURS_OUVRES[m-1]
+                jo_total += jo
+                bg_j = C_PAST if m < now_m else C_TOT
+                tk.Label(self._frame_jh, text=str(jo), bg=bg_j, fg=TEXT_SEC,
+                         font=FONT_SMALL, width=7, anchor="center").grid(
+                    row=jo_row, column=m+1, sticky="ew", padx=1, pady=1)
+            tk.Label(self._frame_jh, text=str(jo_total), bg=C_TOT, fg=TEXT_SEC,
+                     font=FONT_SMALL, width=11, anchor="center").grid(
+                row=jo_row, column=14, sticky="ew", padx=1, pady=1)
 
     def _build_table_eur(self, interv):
         for w in self._frame_eur.winfo_children():
@@ -3967,11 +4189,7 @@ class PdcMajWindow(tk.Toplevel):
                 all_projs.update(prj_dict.keys())
             for (u_norm, prj, m) in self._cache_eur_detail:
                 all_projs.add(prj)
-        projs = sorted(
-            (p for p in all_projs if p not in EXCLUDED_PROJECTS),
-            key=lambda p: self._budgets.get(p) or 0,
-            reverse=True
-        )
+        raw_projs = [p for p in all_projs if p not in EXCLUDED_PROJECTS]
 
         lib_lookup = {}
         if self._cache_ready:
@@ -3980,42 +4198,22 @@ class PdcMajWindow(tk.Toplevel):
                     if prj not in lib_lookup and isinstance(prj_data, dict):
                         lib_lookup[prj] = prj_data.get("_lib", "")
 
-        C_HDR = "#1e3a5f"
-        self._eur_row_widgets = {}
-
-        cols_hdr = [
-            ("Project Code",    12, "w"),
-            ("Project Name",    34, "w"),
-            ("Consommé à date", 16, "e"),
-            ("RAF",             16, "e"),
-            ("Atterrissage",    16, "e"),
-            ("Budget",          14, "e"),
-        ]
-        for ci, (txt, w, anc) in enumerate(cols_hdr):
-            tk.Label(self._frame_eur, text=txt, bg=C_HDR, fg=ACCENT2,
-                     font=("Consolas", 9, "bold"), width=w, anchor=anc,
-                     relief="flat", bd=1).grid(
-                row=0, column=ci, sticky="ew", padx=1, pady=1)
-
         def _fmt(v):
-            return f"{round(v):,} €".replace(",", "\u202f") if v else ""
+            return f"{round(v):,}".replace(",", "\u202f") if v else ""
 
-        mois_futurs = list(range(self._mois_cur, 13))
+        mois_futurs  = list(range(self._mois_cur, 13))
+        nucleus_only = self._nucleus_only_var.get()
 
-        for ri, pc in enumerate(projs, start=1):
-            lib = lib_lookup.get(pc, "")
-
-            nucleus_only = self._nucleus_only_var.get()
-
+        # ── Pré-calcul Consommé / RAF / Atterrissage / Budget par projet ──
+        eur_vals = {}   # {pc: (conso_date, raf, atterr, budget)}
+        for pc in raw_projs:
             conso_date = 0.0
             if self._cache_ready and self._diana_eur:
                 for u_norm, prj_dict in self._diana_eur.items():
                     if nucleus_only and u_norm in self._nucleus_exclusions:
                         continue
-                    # Règle 1a : GUITTARD/ABDELLI — exclure leurs consommés SurvComm
                     if nucleus_only and u_norm in _NUCLEUS_HARDCODED_SURVCOMM_NORM and pc in self._survcomm_projects:
                         continue
-                    # Règle 1b : GUITTARD/TCHIEGAING — exclure leurs consommés Analytic
                     if nucleus_only and u_norm in _NUCLEUS_HARDCODED_ANALYTIC_NORM and pc in self._analytic_projects:
                         continue
                     for m, eur_v in prj_dict.get(pc, {}).items():
@@ -4037,28 +4235,69 @@ class PdcMajWindow(tk.Toplevel):
                 for (u_norm, prj, m), eur_val in self._cache_eur_detail.items():
                     if nucleus_only and u_norm in self._nucleus_exclusions:
                         continue
-                    # Règle 1a : GUITTARD/ABDELLI — exclure leur RAF sur projets SurvComm
                     if nucleus_only and u_norm in _NUCLEUS_HARDCODED_SURVCOMM_NORM and prj in self._survcomm_projects:
                         continue
-                    # Règle 1b : GUITTARD/TCHIEGAING — exclure leur RAF sur projets Analytic
                     if nucleus_only and u_norm in _NUCLEUS_HARDCODED_ANALYTIC_NORM and prj in self._analytic_projects:
                         continue
-                    # Règle 2 : non-intervenants — exclure leur RAF hors projets autorisés
                     if nucleus_only and prj not in _NUCLEUS_ALLOWED_PROJECTS and u_norm not in self._intervenants_norm:
                         continue
                     if prj == pc and m in mois_futurs:
                         raf += eur_val
 
-            atterr = round(conso_date + raf, 2)
+            atterr  = round(conso_date + raf, 2)
+            budget  = self._budgets.get(pc) or 0.0
+            eur_vals[pc] = (conso_date, raf, atterr, budget)
 
-            bg_r = "#1a2530" if ri % 2 == 0 else BG_CARD
+        # ── Tri ───────────────────────────────────────────────────────────
+        _col_idx = {"conso": 0, "raf": 1, "atterr": 2, "budget": 3}
+        def _eur_sort_val(pc, col_key):
+            if col_key == "code":  return pc
+            if col_key == "lib":   return lib_lookup.get(pc, "").lower()
+            idx = _col_idx.get(col_key)
+            if idx is not None:    return eur_vals[pc][idx]
+            return 0.0
+        # Tri par défaut : budget décroissant (comportement d'origine)
+        if "eur" not in self._sort_state:
+            projs = sorted(raw_projs, key=lambda p: eur_vals[p][3], reverse=True)
+        else:
+            projs = self._apply_sort("eur", raw_projs, _eur_sort_val, default_key="budget")
+
+        # ── En-têtes cliquables ───────────────────────────────────────────
+        C_HDR = CA_GREEN
+        self._eur_row_widgets = {}
+        col_defs = [
+            ("Project Code",    "code",  12, "w"),
+            ("Project Name",    "lib",   34, "w"),
+            ("Consommé à date", "conso", 16, "e"),
+            ("RAF",             "raf",   16, "e"),
+            ("Atterrissage",    "atterr",16, "e"),
+            ("Budget",          "budget",14, "e"),
+        ]
+        for ci, (txt, col_key, w, anc) in enumerate(col_defs):
+            lbl = tk.Label(self._frame_eur,
+                           text=self._sort_indicator("eur", col_key, txt),
+                           bg=C_HDR, fg="#ffffff", font=FONT_SMALL_BOLD,
+                           width=w, anchor=anc, relief="flat", bd=1,
+                           cursor="hand2")
+            lbl.grid(row=0, column=ci, sticky="ew", padx=1, pady=1)
+            lbl.bind("<Button-1>",
+                     lambda e, ck=col_key: self._on_sort(
+                         "eur", ck,
+                         lambda: self._build_table_eur(self._interv_var.get())))
+
+        # ── Lignes projets ────────────────────────────────────────────────
+        for ri, pc in enumerate(projs, start=1):
+            lib = lib_lookup.get(pc, "")
+            conso_date, raf, atterr, budget = eur_vals[pc]
+
+            bg_r = "#ffffff" if ri % 2 == 0 else "#F4F4F4"
             row_data = [
-                (pc,              12, "w", TEXT_PRI),
-                (lib[:40],        34, "w", TEXT_SEC),
-                (_fmt(conso_date),16, "e", TEXT_PRI),
-                (_fmt(raf),       16, "e", TEXT_PRI),
+                (pc,              12, "w", "#000000"),
+                (lib[:40],        34, "w", "#000000"),
+                (_fmt(conso_date),16, "e", "#000000"),
+                (_fmt(raf),       16, "e", "#000000"),
                 (_fmt(atterr),    16, "e", ACCENT2),
-                (_fmt(self._budgets.get(pc)), 14, "e", TEXT_SEC),
+                (_fmt(budget),    14, "e", "#000000"),
             ]
             row_lbls = []
             for ci, (txt, w, anc, fg) in enumerate(row_data):
@@ -4077,7 +4316,7 @@ class PdcMajWindow(tk.Toplevel):
             for l in lbls: l.config(bg=bg_r)
         if pc in self._eur_row_widgets:
             lbls, _ = self._eur_row_widgets[pc]
-            for l in lbls: l.config(bg="#2a3a5f")
+            for l in lbls: l.config(bg="#c8e6c9")
         self._selected_proj = pc
         self._show_proj_detail(pc)
 
@@ -4146,92 +4385,491 @@ class PdcMajWindow(tk.Toplevel):
                 log(f"  Rafraîchissement des tableaux pour : {interv}", "info")
             prev_proj = self._selected_proj
             self._build_ecart_list()
-            self._build_table_eur(interv)
-            # Ré-afficher le détail si un projet était sélectionné
+            if self._top_mode == "JH":
+                self._build_table_jh(interv)
+            else:
+                self._build_table_ttnr_interv(interv)
+            if self._bot_mode == "TTNR":
+                self._build_table_eur(interv)
+            else:
+                self._build_table_jh_global()
             if prev_proj:
+                self._selected_proj = prev_proj
+                if prev_proj in self._eur_row_widgets:
+                    lbls, _ = self._eur_row_widgets[prev_proj]
+                    for l in lbls:
+                        l.config(bg="#c8e6c9")
                 self._show_proj_detail(prev_proj)
         else:
             if log:
                 log("  ℹ  Aucun intervenant sélectionné.", "info")
 
+    # ── _build_table_ttnr_interv ─────────────────────────────────────────
+    def _build_table_ttnr_interv(self, interv):
+        """Cadran haut-gauche mode TTNR : EUR par mois de l'intervenant (12 mois + Total).
+        Passé = diana_eur (réel), Futur = cache_eur_detail (RAF PDC).
+        Même structure visuelle que le tableau JH."""
+        for w in self._frame_jh.winfo_children():
+            w.destroy()
+
+        if not self._cache_ready:
+            return
+
+        tous         = (interv == "Tous")
+        interv_norm  = None if tous else _norm_name(interv)
+        now_m        = self._mois_cur
+        mois_passes  = list(range(1, now_m))
+        mois_futurs  = list(range(now_m, 13))
+        nucleus_only = self._nucleus_only_var.get()
+
+        C_HDR    = CA_GREEN
+        C_PAST   = "#c8e6c9"
+        C_PAST_H = "#2e5c2e"
+
+        # Projets (tous intervenants si "Tous", sinon l'intervenant sélectionné)
+        if tous:
+            projs_jh    = set()
+            for pd2 in self._cache_jh.values():
+                projs_jh.update(pd2.keys())
+            projs_diana = set()
+            for pd2 in self._diana_eur.values():
+                projs_diana.update(pd2.keys())
+            projs_raf   = {pr for (un, pr, m) in self._cache_eur_detail}
+        else:
+            projs_jh    = set(self._cache_jh.get(interv_norm, {}).keys())
+            projs_diana = set(self._diana_eur.get(interv_norm, {}).keys())
+            projs_raf   = {pr for (un, pr, m) in self._cache_eur_detail
+                           if un == interv_norm}
+        all_projs_raw = [p for p in (projs_jh | projs_diana | projs_raf)
+                         if p not in EXCLUDED_PROJECTS]
+
+        lib_lookup = {}
+        for prj_dict in self._cache_jh.values():
+            for prj, prj_data in prj_dict.items():
+                if prj not in lib_lookup and isinstance(prj_data, dict):
+                    lib_lookup[prj] = prj_data.get("_lib", "")
+
+        def _fmt(v):
+            """Format EUR : séparateur milliers espace insécable."""
+            return f"{round(v):,}".replace(",", "\u202f") if v else ""
+
+        # ── Pré-calcul RAF par projet × mois ──────────────────────────────
+        raf_pm = {}   # {pc: {m: eur}}
+        for (un, pr, m), v in self._cache_eur_detail.items():
+            if (not tous and un != interv_norm) or m not in mois_futurs:
+                continue
+            if nucleus_only and pr not in _NUCLEUS_ALLOWED_PROJECTS \
+                    and (tous or interv_norm not in self._intervenants_norm):
+                continue
+            raf_pm.setdefault(pr, {})[m] = raf_pm.get(pr, {}).get(m, 0.0) + v
+
+        # ── Pré-calcul valeurs pour tri ────────────────────────────────────
+        def _ttnr_val(pc, m_or_key):
+            if m_or_key == "code":  return pc
+            if m_or_key == "lib":   return lib_lookup.get(pc, "").lower()
+            if isinstance(m_or_key, int):
+                if m_or_key < now_m:
+                    if tous:
+                        return sum(pd2.get(pc, {}).get(m_or_key, 0.0)
+                                   for pd2 in self._diana_eur.values())
+                    return self._diana_eur.get(interv_norm, {}).get(pc, {}).get(m_or_key, 0.0)
+                return raf_pm.get(pc, {}).get(m_or_key, 0.0)
+            # "total"
+            past = (sum(sum(pd2.get(pc, {}).get(m, 0.0) for pd2 in self._diana_eur.values())
+                        for m in mois_passes)
+                    if tous else
+                    sum(self._diana_eur.get(interv_norm, {}).get(pc, {}).get(m, 0.0)
+                        for m in mois_passes))
+            futur = sum(raf_pm.get(pc, {}).get(m, 0.0) for m in mois_futurs)
+            return past + futur
+
+        projs = self._apply_sort("ttnr", all_projs_raw, _ttnr_val, default_key="code")
+
+        # ── En-têtes cliquables ───────────────────────────────────────────
+        def _ttnr_hdr(text, col_key, col, width, anchor="w", bg=C_HDR, fg="#ffffff"):
+            lbl = tk.Label(self._frame_jh,
+                           text=self._sort_indicator("ttnr", col_key, text),
+                           bg=bg, fg=fg, font=FONT_SMALL_BOLD,
+                           width=width, anchor=anchor,
+                           relief="flat", bd=1, cursor="hand2")
+            lbl.grid(row=0, column=col, sticky="ew", padx=1, pady=1)
+            lbl.bind("<Button-1>",
+                     lambda e, ck=col_key: self._on_sort(
+                         "ttnr", ck, lambda: self._build_table_ttnr_interv(interv)))
+
+        _ttnr_hdr("Project Code", "code",  0,  12, anchor="w")
+        _ttnr_hdr("Project Name", "lib",   1,  30, anchor="w")
+        for m in range(1, 13):
+            bg_h = C_PAST if m < now_m else C_HDR
+            fg_h = C_PAST_H if m < now_m else "#ffffff"
+            _ttnr_hdr(MOIS_ABBREV[m-1], m, m+1, 7, anchor="center", bg=bg_h, fg=fg_h)
+        _ttnr_hdr("Total", "total", 14, 11, anchor="center")
+
+        col_totals  = [0.0] * 12   # index 0 = mois 1
+        grand_total = 0.0
+
+        # ── Lignes projets ─────────────────────────────────────────────────
+        for ri, pc in enumerate(projs, start=1):
+            lib  = lib_lookup.get(pc, "")
+            bg_r = "#ffffff" if ri % 2 == 0 else "#F4F4F4"
+            tk.Label(self._frame_jh, text=pc, bg=bg_r, fg="#000000",
+                     font=FONT_SMALL, width=12, anchor="w").grid(
+                row=ri, column=0, sticky="ew", padx=1, pady=1)
+            tk.Label(self._frame_jh, text=lib[:36], bg=bg_r, fg="#000000",
+                     font=FONT_SMALL, width=30, anchor="w").grid(
+                row=ri, column=1, sticky="ew", padx=1, pady=1)
+            row_total = 0.0
+            for m in range(1, 13):
+                if m < now_m:
+                    if tous:
+                        val = sum(
+                            pd2.get(pc, {}).get(m, 0.0)
+                            for pd2 in self._diana_eur.values()
+                        )
+                    else:
+                        val = self._diana_eur.get(interv_norm, {}).get(pc, {}).get(m, 0.0)
+                    bg_c = C_PAST
+                    fg_c = C_PAST_H
+                else:
+                    val  = raf_pm.get(pc, {}).get(m, 0.0)
+                    bg_c = bg_r
+                    fg_c = "#000000"
+                row_total          += val
+                col_totals[m - 1]  += val
+                tk.Label(self._frame_jh, text=_fmt(val), bg=bg_c, fg=fg_c,
+                         font=FONT_SMALL, width=7, anchor="e").grid(
+                    row=ri, column=m+1, sticky="ew", padx=1, pady=1)
+            grand_total += row_total
+            tk.Label(self._frame_jh, text=_fmt(row_total), bg=bg_r, fg="#000000",
+                     font=FONT_SMALL_BOLD, width=11, anchor="e").grid(
+                row=ri, column=14, sticky="ew", padx=1, pady=1)
+
+        # ── Ligne Total ────────────────────────────────────────────────────
+        tot_row = len(projs) + 1
+        C_TOT   = "#F7F7F7"
+        tk.Label(self._frame_jh, text="Total", bg=C_TOT, fg="#001a33",
+                 font=FONT_SMALL_BOLD, width=12, anchor="e").grid(
+            row=tot_row, column=0, columnspan=2, sticky="ew", padx=1, pady=1)
+        for m in range(1, 13):
+            bg_t = C_PAST if m < now_m else C_TOT
+            fg_t = C_PAST_H if m < now_m else "#000000"
+            tk.Label(self._frame_jh, text=_fmt(col_totals[m - 1]), bg=bg_t, fg=fg_t,
+                     font=FONT_SMALL_BOLD, width=7, anchor="e").grid(
+                row=tot_row, column=m+1, sticky="ew", padx=1, pady=1)
+        tk.Label(self._frame_jh, text=_fmt(grand_total), bg=C_TOT, fg="#000000",
+                 font=FONT_SMALL_BOLD, width=11, anchor="e").grid(
+            row=tot_row, column=14, sticky="ew", padx=1, pady=1)
+
+    # ── _build_table_jh_global ───────────────────────────────────────────
+    def _build_table_jh_global(self):
+        """Cadran bas-gauche mode JH : Consommé / RAF / Atterrissage JH agrégés tous intervenants."""
+        for w in self._frame_eur.winfo_children():
+            w.destroy()
+        for w in self._frame_detail.winfo_children():
+            w.destroy()
+        self._selected_proj = None
+
+        if not self._cache_ready:
+            return
+
+        mois_passes  = list(range(1, self._mois_cur))
+        mois_futurs  = list(range(self._mois_cur, 13))
+        nucleus_only = self._nucleus_only_var.get()
+
+        # Collecte tous les projets connus
+        all_projs = set()
+        for prj_dict in self._cache_jh.values():
+            all_projs.update(p for p in prj_dict if p not in EXCLUDED_PROJECTS)
+        for prj_dict in self._diana_jh.values():
+            all_projs.update(p for p in prj_dict if p not in EXCLUDED_PROJECTS)
+        raw_projs = list(all_projs)
+
+        lib_lookup = {}
+        for prj_dict in self._cache_jh.values():
+            for prj, prj_data in prj_dict.items():
+                if prj not in lib_lookup and isinstance(prj_data, dict):
+                    lib_lookup[prj] = prj_data.get("_lib", "")
+
+        def _fmt_jh(v):
+            return str(int(v)) if v and v == int(v) else (f"{v:.1f}" if v else "")
+
+        # ── Pré-calcul Consommé / RAF / Atterrissage ──────────────────────
+        jh_vals = {}   # {pc: (conso_jh, raf_jh, atterr_jh)}
+        for pc in raw_projs:
+            conso_jh = 0.0
+            for u_norm, prj_dict in self._diana_jh.items():
+                if nucleus_only and u_norm in self._nucleus_exclusions:
+                    continue
+                if nucleus_only and u_norm in _NUCLEUS_HARDCODED_SURVCOMM_NORM and pc in self._survcomm_projects:
+                    continue
+                if nucleus_only and u_norm in _NUCLEUS_HARDCODED_ANALYTIC_NORM and pc in self._analytic_projects:
+                    continue
+                for m, v in prj_dict.get(pc, {}).items():
+                    if m in mois_passes:
+                        conso_jh += v
+            raf_jh = 0.0
+            for u_norm, prj_dict in self._cache_jh.items():
+                if nucleus_only and u_norm in self._nucleus_exclusions:
+                    continue
+                if nucleus_only and u_norm in _NUCLEUS_HARDCODED_SURVCOMM_NORM and pc in self._survcomm_projects:
+                    continue
+                if nucleus_only and u_norm in _NUCLEUS_HARDCODED_ANALYTIC_NORM and pc in self._analytic_projects:
+                    continue
+                if nucleus_only and pc not in _NUCLEUS_ALLOWED_PROJECTS and u_norm not in self._intervenants_norm:
+                    continue
+                if pc in prj_dict and isinstance(prj_dict[pc], dict):
+                    for m, v in prj_dict[pc].items():
+                        if isinstance(m, int) and m in mois_futurs:
+                            raf_jh += v
+            jh_vals[pc] = (conso_jh, raf_jh, round(conso_jh + raf_jh, 2))
+
+        # ── Tri ───────────────────────────────────────────────────────────
+        _jh_g_idx = {"conso": 0, "raf": 1, "atterr": 2}
+        def _jh_g_sort_val(pc, col_key):
+            if col_key == "code":   return pc
+            if col_key == "lib":    return lib_lookup.get(pc, "").lower()
+            if col_key == "budget": return self._budgets.get(pc) or 0.0
+            idx = _jh_g_idx.get(col_key)
+            if idx is not None:     return jh_vals[pc][idx]
+            return 0.0
+        if "jh_global" not in self._sort_state:
+            projs = sorted(raw_projs, key=lambda p: self._budgets.get(p) or 0, reverse=True)
+        else:
+            projs = self._apply_sort("jh_global", raw_projs, _jh_g_sort_val, default_key="budget")
+
+        # ── En-têtes cliquables ───────────────────────────────────────────
+        C_HDR = CA_GREEN
+        self._eur_row_widgets = {}
+        col_defs_g = [
+            ("Project Code",    "code",  12, "w"),
+            ("Project Name",    "lib",   34, "w"),
+            ("Consommé à date", "conso", 16, "e"),
+            ("RAF",             "raf",   16, "e"),
+            ("Atterrissage",    "atterr",16, "e"),
+            ("Budget",          "budget",14, "e"),
+        ]
+        for ci, (txt, col_key, w, anc) in enumerate(col_defs_g):
+            lbl = tk.Label(self._frame_eur,
+                           text=self._sort_indicator("jh_global", col_key, txt),
+                           bg=C_HDR, fg="#ffffff", font=FONT_SMALL_BOLD,
+                           width=w, anchor=anc, relief="flat", bd=1,
+                           cursor="hand2")
+            lbl.grid(row=0, column=ci, sticky="ew", padx=1, pady=1)
+            lbl.bind("<Button-1>",
+                     lambda e, ck=col_key: self._on_sort(
+                         "jh_global", ck, self._build_table_jh_global))
+
+        # ── Lignes projets ────────────────────────────────────────────────
+        for ri, pc in enumerate(projs, start=1):
+            lib = lib_lookup.get(pc, "")
+            conso_jh, raf_jh, atterr_jh = jh_vals[pc]
+            bg_r = "#ffffff" if ri % 2 == 0 else "#F4F4F4"
+
+            row_data = [
+                (pc,                  12, "w", "#000000"),
+                (lib[:40],            34, "w", "#000000"),
+                (_fmt_jh(conso_jh),   16, "e", "#000000"),
+                (_fmt_jh(raf_jh),     16, "e", "#000000"),
+                (_fmt_jh(atterr_jh),  16, "e", ACCENT2),
+                ("",                  14, "e", "#000000"),   # Budget : vide en mode JH
+            ]
+            row_lbls = []
+            for ci, (txt, w, anc, fg) in enumerate(row_data):
+                lbl = tk.Label(self._frame_eur, text=txt, bg=bg_r,
+                               fg=fg, font=FONT_SMALL, width=w, anchor=anc,
+                               cursor="hand2")
+                lbl.grid(row=ri, column=ci, sticky="ew", padx=1, pady=1)
+                lbl.bind("<Button-1>",
+                         lambda e, p=pc, bg=bg_r: self._on_proj_click(p, bg))
+                row_lbls.append(lbl)
+            self._eur_row_widgets[pc] = (row_lbls, bg_r)
+
+    # ── _show_proj_detail ────────────────────────────────────────────────
     def _show_proj_detail(self, pc):
         for w in self._frame_detail.winfo_children():
             w.destroy()
 
-        C_HDR = "#1e3a5f"
+        C_HDR = CA_GREEN
         mois_passes_d = list(range(1, self._mois_cur))
         mois_futurs_d = list(range(self._mois_cur, 13))
+        nucleus_only  = self._nucleus_only_var.get()
+        mode          = self._bot_mode   # "EUR" → "TTNR", "JH" → "JH"
 
-        def _fmt_d(v):
-            return f"{round(v):,} €".replace(",", "\u202f") if v else ""
+        if mode == "TTNR":
+            # ── mode EUR ──────────────────────────────────────────────────
+            def _fmt_d(v):
+                return f"{round(v):,}".replace(",", "\u202f") if v else ""
 
-        for ci, (txt, w) in enumerate([
-            ("Intervenant",     29), ("Consommé à date", 16),
-            ("RAF",             14), ("Atterrissage",    16)
-        ]):
-            tk.Label(self._frame_detail, text=txt, bg=C_HDR, fg=ACCENT2,
-                     font=("Consolas", 9, "bold"), width=w,
-                     anchor="w" if ci == 0 else "e",
-                     relief="flat", bd=1).grid(
-                row=0, column=ci, sticky="ew", padx=1, pady=1)
+            detail = {}
+            if self._cache_ready:
+                for u_norm, prj_dict in self._cache_jh.items():
+                    if pc in prj_dict:
+                        if nucleus_only and u_norm in self._nucleus_exclusions:
+                            continue
+                        if nucleus_only and u_norm in _NUCLEUS_HARDCODED_SURVCOMM_NORM and pc in self._survcomm_projects:
+                            continue
+                        if nucleus_only and u_norm in _NUCLEUS_HARDCODED_ANALYTIC_NORM and pc in self._analytic_projects:
+                            continue
+                        u_orig = next(
+                            (v for v in (self._cache_usernames or [])
+                             if _norm_name(v) == u_norm), u_norm)
+                        c_date = sum(
+                            self._diana_eur.get(u_norm, {}).get(pc, {}).get(m, 0.0)
+                            for m in mois_passes_d)
+                        raf_v = sum(
+                            v for (un, pr, m), v in self._cache_eur_detail.items()
+                            if un == u_norm and pr == pc and m in mois_futurs_d)
+                        if nucleus_only and pc not in _NUCLEUS_ALLOWED_PROJECTS and u_norm not in self._intervenants_norm:
+                            raf_v = 0.0
+                        if c_date or raf_v:
+                            detail[u_orig] = (c_date, raf_v)
 
-        nucleus_only = self._nucleus_only_var.get()
-        detail = {}
-        if self._cache_ready:
-            for u_norm, prj_dict in self._cache_jh.items():
-                if pc in prj_dict:
-                    # Filtre Nucleus : exclure les intervenants uniquement Surv.Comm. ou Analytic
+            # Tri
+            _dt_col_map = {"interv": 0, "conso": 0, "raf": 1, "atterr": 2}
+            col_dt, dir_dt = self._sort_state.get("detail_ttnr", ("atterr", "desc"))
+            rev_dt = (dir_dt == "desc")
+            def _dt_key(item):
+                u, (cd, rv) = item
+                if col_dt == "interv": return _norm_name(u)
+                if col_dt == "conso":  return cd
+                if col_dt == "raf":    return rv
+                return cd + rv   # atterr
+            rows_ttnr = sorted(detail.items(), key=_dt_key, reverse=rev_dt)
+
+            # En-têtes cliquables
+            _dt_cols = [
+                ("interv", "Intervenant",     29, "w"),
+                ("conso",  "Consommé à date", 16, "e"),
+                ("raf",    "RAF",             14, "e"),
+                ("atterr", "Atterrissage",    16, "e"),
+            ]
+            for ci, (ck, txt, w, anc) in enumerate(_dt_cols):
+                lbl = tk.Label(self._frame_detail,
+                               text=self._sort_indicator("detail_ttnr", ck, txt),
+                               bg=C_HDR, fg="#ffffff", font=FONT_SMALL_BOLD,
+                               width=w, anchor=anc, relief="flat", bd=1,
+                               cursor="hand2")
+                lbl.grid(row=0, column=ci, sticky="ew", padx=1, pady=1)
+                lbl.bind("<Button-1>",
+                         lambda e, k=ck: self._on_sort(
+                             "detail_ttnr", k, lambda: self._show_proj_detail(pc)))
+
+            tot_cd = tot_raf = 0.0
+            for ri, (u_orig, (cd, raf_v)) in enumerate(rows_ttnr, start=1):
+                bg_r = "#ffffff" if ri % 2 == 0 else "#F4F4F4"
+                atterr_v = round(cd + raf_v, 2)
+                for ci, (val, w, fg) in enumerate([
+                    (u_orig[:29],     29, "#000000"),
+                    (_fmt_d(cd),      16, "#000000"),
+                    (_fmt_d(raf_v),   14, "#000000"),
+                    (_fmt_d(atterr_v),16, ACCENT2),
+                ]):
+                    tk.Label(self._frame_detail, text=val, bg=bg_r,
+                             fg=fg, font=FONT_SMALL, width=w,
+                             anchor="w" if ci == 0 else "e").grid(
+                        row=ri, column=ci, sticky="ew", padx=1, pady=1)
+                tot_cd  += cd
+                tot_raf += raf_v
+
+            tot_row    = 1 + len(detail)
+            tot_atterr = round(tot_cd + tot_raf, 2)
+            for ci, (val, w) in enumerate([
+                ("Total",             29), (_fmt_d(tot_cd),     16),
+                (_fmt_d(tot_raf),     14), (_fmt_d(tot_atterr), 16)
+            ]):
+                tk.Label(self._frame_detail, text=val, bg="#F7F7F7", fg="#001a33",
+                         font=FONT_SMALL_BOLD, width=w,
+                         anchor="e").grid(
+                    row=tot_row, column=ci, sticky="ew", padx=1, pady=1)
+
+        else:
+            # ── mode JH ───────────────────────────────────────────────────
+            def _fmt_jh(v):
+                return str(int(v)) if v and v == int(v) else (f"{v:.1f}" if v else "")
+
+            detail_jh = {}
+            if self._cache_ready:
+                for u_norm, prj_dict in self._cache_jh.items():
+                    if pc not in prj_dict:
+                        continue
                     if nucleus_only and u_norm in self._nucleus_exclusions:
                         continue
-                    # Règle 1a : GUITTARD/ABDELLI — exclure entièrement sur projets SurvComm
                     if nucleus_only and u_norm in _NUCLEUS_HARDCODED_SURVCOMM_NORM and pc in self._survcomm_projects:
                         continue
-                    # Règle 1b : GUITTARD/TCHIEGAING — exclure entièrement sur projets Analytic
                     if nucleus_only and u_norm in _NUCLEUS_HARDCODED_ANALYTIC_NORM and pc in self._analytic_projects:
                         continue
                     u_orig = next(
                         (v for v in (self._cache_usernames or [])
                          if _norm_name(v) == u_norm), u_norm)
-                    c_date = sum(
-                        self._diana_eur.get(u_norm, {}).get(pc, {}).get(m, 0.0)
+                    conso_jh = sum(
+                        self._diana_jh.get(u_norm, {}).get(pc, {}).get(m, 0.0)
                         for m in mois_passes_d)
-                    raf_v = sum(
-                        v for (un, pr, m), v in self._cache_eur_detail.items()
-                        if un == u_norm and pr == pc and m in mois_futurs_d)
-                    # Règle 2 : non-intervenants — exclure leur RAF hors projets autorisés
+                    raf_jh = 0.0
+                    if isinstance(prj_dict[pc], dict):
+                        for m, v in prj_dict[pc].items():
+                            if isinstance(m, int) and m in mois_futurs_d:
+                                raf_jh += v
                     if nucleus_only and pc not in _NUCLEUS_ALLOWED_PROJECTS and u_norm not in self._intervenants_norm:
-                        raf_v = 0.0
-                    if c_date or raf_v:
-                        detail[u_orig] = (c_date, raf_v)
+                        raf_jh = 0.0
+                    if conso_jh or raf_jh:
+                        detail_jh[u_orig] = (conso_jh, raf_jh)
 
-        tot_cd = tot_raf = 0.0
-        for ri, (u_orig, (cd, raf_v)) in enumerate(
-                sorted(detail.items(), key=lambda x: -(x[1][0]+x[1][1])), start=1):
-            bg_r = "#1a2530" if ri % 2 == 0 else BG_CARD
-            atterr_v = round(cd + raf_v, 2)
-            for ci, (val, w, fg) in enumerate([
-                (u_orig[:29],    29, TEXT_PRI),
-                (_fmt_d(cd),     16, TEXT_PRI),
-                (_fmt_d(raf_v),  14, TEXT_PRI),
-                (_fmt_d(atterr_v),16, ACCENT2),
+            # Tri
+            col_dj, dir_dj = self._sort_state.get("detail_jh", ("atterr", "desc"))
+            rev_dj = (dir_dj == "desc")
+            def _dj_key(item):
+                u, (cd, rv) = item
+                if col_dj == "interv": return _norm_name(u)
+                if col_dj == "conso":  return cd
+                if col_dj == "raf":    return rv
+                return cd + rv   # atterr
+            rows_jh = sorted(detail_jh.items(), key=_dj_key, reverse=rev_dj)
+
+            # En-têtes cliquables
+            _dj_cols = [
+                ("interv", "Intervenant",     29, "w"),
+                ("conso",  "Consommé à date", 16, "e"),
+                ("raf",    "RAF",             14, "e"),
+                ("atterr", "Atterrissage",    16, "e"),
+            ]
+            for ci, (ck, txt, w, anc) in enumerate(_dj_cols):
+                lbl = tk.Label(self._frame_detail,
+                               text=self._sort_indicator("detail_jh", ck, txt),
+                               bg=C_HDR, fg="#ffffff", font=FONT_SMALL_BOLD,
+                               width=w, anchor=anc, relief="flat", bd=1,
+                               cursor="hand2")
+                lbl.grid(row=0, column=ci, sticky="ew", padx=1, pady=1)
+                lbl.bind("<Button-1>",
+                         lambda e, k=ck: self._on_sort(
+                             "detail_jh", k, lambda: self._show_proj_detail(pc)))
+
+            tot_cd = tot_raf = 0.0
+            for ri, (u_orig, (cd, raf_v)) in enumerate(rows_jh, start=1):
+                bg_r = "#ffffff" if ri % 2 == 0 else "#F4F4F4"
+                atterr_v = round(cd + raf_v, 2)
+                for ci, (val, w, fg) in enumerate([
+                    (u_orig[:29],      29, "#000000"),
+                    (_fmt_jh(cd),      16, "#000000"),
+                    (_fmt_jh(raf_v),   14, "#000000"),
+                    (_fmt_jh(atterr_v),16, ACCENT2),
+                ]):
+                    tk.Label(self._frame_detail, text=val, bg=bg_r,
+                             fg=fg, font=FONT_SMALL, width=w,
+                             anchor="w" if ci == 0 else "e").grid(
+                        row=ri, column=ci, sticky="ew", padx=1, pady=1)
+                tot_cd  += cd
+                tot_raf += raf_v
+
+            tot_row    = 1 + len(detail_jh)
+            tot_atterr = round(tot_cd + tot_raf, 2)
+            for ci, (val, w) in enumerate([
+                ("Total",               29), (_fmt_jh(tot_cd),     16),
+                (_fmt_jh(tot_raf),      14), (_fmt_jh(tot_atterr), 16)
             ]):
-                tk.Label(self._frame_detail, text=val, bg=bg_r,
-                         fg=fg, font=FONT_SMALL, width=w,
-                         anchor="w" if ci == 0 else "e").grid(
-                    row=ri, column=ci, sticky="ew", padx=1, pady=1)
-            tot_cd  += cd
-            tot_raf += raf_v
-
-        tot_row    = 1 + len(detail)
-        tot_atterr = round(tot_cd + tot_raf, 2)
-        for ci, (val, w) in enumerate([
-            ("Total",             29), (_fmt_d(tot_cd),     16),
-            (_fmt_d(tot_raf),     14), (_fmt_d(tot_atterr), 16)
-        ]):
-            tk.Label(self._frame_detail, text=val, bg=C_HDR, fg=ACCENT2,
-                     font=("Consolas", 9, "bold"), width=w,
-                     anchor="e").grid(
-                row=tot_row, column=ci, sticky="ew", padx=1, pady=1)
+                tk.Label(self._frame_detail, text=val, bg="#F7F7F7", fg="#001a33",
+                         font=FONT_SMALL_BOLD, width=w,
+                         anchor="e").grid(
+                    row=tot_row, column=ci, sticky="ew", padx=1, pady=1)
 
     def _on_cell_edit(self, proj_code, mois, var, orig_val):
         raw = var.get().strip().replace(",", ".")
@@ -4260,30 +4898,36 @@ class PdcMajWindow(tk.Toplevel):
             self._status.set(f"⚠  Impossible d'écrire le log : {e}")
 
     def _build_ui(self):
-        hdr = tk.Frame(self, bg=BG_MAIN, pady=8)
-        hdr.pack(fill="x", padx=16)
+        hdr = tk.Frame(self, bg=CA_GREEN, pady=8)
+        hdr.pack(fill="x")
         tk.Label(hdr, text="📝  MISE À JOUR PLAN DE CHARGES",
-                 bg=BG_MAIN, fg=ACCENT2, font=FONT_HEAD).pack(side="left")
+                 bg=CA_GREEN, fg="#ffffff", font=FONT_HEAD,
+                 padx=16).pack(side="left")
         tk.Label(hdr, text=f"Année {self._annee}",
-                 bg=BG_MAIN, fg=TEXT_SEC, font=FONT_SMALL).pack(side="right")
+                 bg=CA_GREEN, fg="#ffffff", font=FONT_SMALL,
+                 padx=16).pack(side="right")
         tk.Frame(self, bg=BORDER, height=1).pack(fill="x")
 
-        sel_frame = tk.Frame(self, bg=BG_PANEL, pady=6)
+        sel_frame = tk.Frame(self, bg=BG_MAIN, pady=6)
         sel_frame.pack(fill="x", padx=10, pady=(6, 2))
-        tk.Label(sel_frame, text="UserName :", bg=BG_PANEL,
+        tk.Label(sel_frame, text="Intervenant :", bg=BG_MAIN,
                  fg=TEXT_SEC, font=FONT_SMALL).pack(side="left", padx=(10, 4))
+        _cb_style = ttk.Style()
+        _cb_style.configure("PdcWhite.TCombobox", fieldbackground="white", background=BG_MAIN)
+        _cb_style.map("PdcWhite.TCombobox",
+                      fieldbackground=[("readonly", "white")],
+                      background=[("readonly", BG_MAIN)])
         self._cb_interv = ttk.Combobox(
             sel_frame, textvariable=self._interv_var,
-            state="readonly", width=35, font=FONT_SMALL)
+            state="readonly", width=35, font=FONT_SMALL,
+            style="PdcWhite.TCombobox")
         self._cb_interv.pack(side="left")
-        self._cb_interv.bind("<<ComboboxSelected>>", self._refresh_tables)
-        make_button(sel_frame, "↺  Rafraîchir", self._refresh_tables,
-                    width=14).pack(side="left", padx=12)
+        self._cb_interv.bind("<<ComboboxSelected>>", self._on_interv_change)
         tk.Checkbutton(
             sel_frame, text="Périmètre Nucleus uniquement",
             variable=self._nucleus_only_var,
-            bg=BG_PANEL, fg=TEXT_SEC, font=FONT_SMALL,
-            selectcolor=BG_ENTRY, activebackground=BG_PANEL,
+            bg=BG_MAIN, fg=TEXT_SEC, font=FONT_SMALL,
+            selectcolor=BG_ENTRY, activebackground=BG_MAIN,
             activeforeground=TEXT_PRI,
             command=self._on_nucleus_filter,
         ).pack(side="right", padx=(0, 12))
@@ -4305,7 +4949,7 @@ class PdcMajWindow(tk.Toplevel):
             outer = tk.Frame(parent, bg=BG_PANEL,
                              highlightbackground=BORDER, highlightthickness=1)
             outer.grid(row=0, column=col, sticky="nsew", padx=4, pady=4)
-            tk.Label(outer, text=title, bg=BG_PANEL, fg=ACCENT2,
+            tk.Label(outer, text=title, bg=BG_PANEL, fg=CA_GREEN,
                      font=FONT_BODY, anchor="w").pack(fill="x", padx=6, pady=(4, 2))
             tk.Frame(outer, bg=BORDER, height=1).pack(fill="x")
             cf = tk.Frame(outer, bg=BG_PANEL)
@@ -4313,12 +4957,12 @@ class PdcMajWindow(tk.Toplevel):
             if vscroll or not autowidth:
                 vsb = tk.Scrollbar(cf, orient="vertical")
                 vsb.pack(side="right", fill="y")
-            c = tk.Canvas(cf, bg=BG_MAIN, bd=0, highlightthickness=0,
+            c = tk.Canvas(cf, bg="#ffffff", bd=0, highlightthickness=0,
                           yscrollcommand=vsb.set if (vscroll or not autowidth) else None)
             if vscroll or not autowidth:
                 vsb.config(command=c.yview)
             c.pack(side="left", fill="both", expand=True)
-            inner = tk.Frame(c, bg=BG_MAIN)
+            inner = tk.Frame(c, bg="#ffffff")
             cw = c.create_window((0, 0), window=inner, anchor="nw")
             if autowidth:
                 inner.bind("<Configure>",
@@ -4339,28 +4983,121 @@ class PdcMajWindow(tk.Toplevel):
                        lambda e, cv=c: cv.unbind_all("<MouseWheel>"))
             return inner
 
+        # ── helper : cadran gauche avec toggle JH / TTNR ──────────────────
+        def _make_left_pane(parent, col, init_mode, on_toggle, autowidth=False):
+            outer = tk.Frame(parent, bg=BG_PANEL,
+                             highlightbackground=BORDER, highlightthickness=1)
+            outer.grid(row=0, column=col, sticky="nsew", padx=4, pady=4)
+
+            hf = tk.Frame(outer, bg=BG_PANEL)
+            hf.pack(fill="x", padx=4, pady=(4, 2))
+            lbl_jh = tk.Label(hf, text="Plan de charges JH", font=FONT_BODY,
+                              padx=8, pady=2, cursor="hand2", relief="flat")
+            lbl_ttnr = tk.Label(hf, text="Plan de charges TTNR", font=FONT_BODY,
+                                padx=8, pady=2, cursor="hand2", relief="flat")
+            lbl_jh.pack(side="left", padx=(0, 4))
+            lbl_ttnr.pack(side="left")
+
+            def _upd(mode):
+                if mode == "JH":
+                    lbl_jh.config(bg=CA_GREEN, fg="#ffffff")
+                    lbl_ttnr.config(bg=BG_PANEL, fg=TEXT_SEC)
+                else:
+                    lbl_jh.config(bg=BG_PANEL, fg=TEXT_SEC)
+                    lbl_ttnr.config(bg=CA_GREEN, fg="#ffffff")
+            _upd(init_mode)
+            lbl_jh.bind("<Button-1>",   lambda e: on_toggle("JH"))
+            lbl_ttnr.bind("<Button-1>", lambda e: on_toggle("TTNR"))
+
+            tk.Frame(outer, bg=BORDER, height=1).pack(fill="x")
+
+            cf = tk.Frame(outer, bg=BG_PANEL)
+            cf.pack(fill="both", expand=True)
+            vsb = tk.Scrollbar(cf, orient="vertical")
+            vsb.pack(side="right", fill="y")
+            c = tk.Canvas(cf, bg="#ffffff", bd=0, highlightthickness=0,
+                          yscrollcommand=vsb.set)
+            vsb.config(command=c.yview)
+            c.pack(side="left", fill="both", expand=True)
+            inner = tk.Frame(c, bg="#ffffff")
+            cw = c.create_window((0, 0), window=inner, anchor="nw")
+            if autowidth:
+                inner.bind("<Configure>",
+                           lambda e, cv=c, w=cw:
+                               cv.config(width=e.width, scrollregion=cv.bbox("all")))
+            else:
+                inner.bind("<Configure>",
+                           lambda e, cv=c: cv.configure(scrollregion=cv.bbox("all")))
+                c.bind("<Configure>",
+                       lambda e, cv=c, w=cw: cv.itemconfig(w, width=e.width))
+            c.bind("<Enter>",
+                   lambda e, cv=c: cv.bind_all(
+                       "<MouseWheel>",
+                       lambda ev, cv=cv: cv.yview_scroll(
+                           -1 if ev.delta > 0 else 1, "units")))
+            c.bind("<Leave>",
+                   lambda e, cv=c: cv.unbind_all("<MouseWheel>"))
+            return inner, _upd
+
+        # ── callbacks toggle ────────────────────────────────────────────────
+        def _on_top_toggle(mode):
+            self._top_mode = mode
+            if self._update_top_toggle:
+                self._update_top_toggle(mode)
+            interv = self._interv_var.get()
+            if not interv:
+                return
+            if mode == "JH":
+                self._build_table_jh(interv)
+            else:
+                self._build_table_ttnr_interv(interv)
+
+        def _on_bot_toggle(mode):
+            self._bot_mode = mode
+            if self._update_bot_toggle:
+                self._update_bot_toggle(mode)
+            interv = self._interv_var.get()
+            if not interv:
+                return
+            prev = self._selected_proj
+            if mode == "TTNR":
+                self._build_table_eur(interv)
+            else:
+                self._build_table_jh_global()
+            if prev:
+                # Restaurer la sélection : re-highlighter la ligne et réafficher le détail
+                self._selected_proj = prev
+                if prev in self._eur_row_widgets:
+                    lbls, _ = self._eur_row_widgets[prev]
+                    for l in lbls:
+                        l.config(bg="#c8e6c9")
+                self._show_proj_detail(prev)
+
+        # ── row 1 ───────────────────────────────────────────────────────────
         row1 = tk.Frame(body, bg=BG_MAIN)
         row1.grid(row=0, column=0, sticky="nsew")
         row1.rowconfigure(0, weight=1)
         row1.columnconfigure(0, weight=0)
         row1.columnconfigure(1, weight=1)
 
-        self._frame_jh    = _make_quad(row1, "Plan de charges en JH  (mois passés modifiables)", 0, autowidth=True)
+        self._frame_jh, self._update_top_toggle = _make_left_pane(
+            row1, 0, self._top_mode, _on_top_toggle, autowidth=True)
         self._frame_ecart = _make_quad(row1, "Écarts JH / JO", 1)
 
+        # ── row 2 ───────────────────────────────────────────────────────────
         row2 = tk.Frame(body, bg=BG_MAIN)
         row2.grid(row=1, column=0, sticky="nsew")
         row2.rowconfigure(0, weight=1)
         row2.columnconfigure(0, weight=0)
         row2.columnconfigure(1, weight=1)
 
-        # Cadran bas-gauche : Plan de charges TTNR
-        self._frame_eur = _make_quad(row2, "Plan de charges TTNR", 0, autowidth=True, vscroll=True)
+        self._frame_eur, self._update_bot_toggle = _make_left_pane(
+            row2, 0, self._bot_mode, _on_bot_toggle, autowidth=True)
 
         # Cadran bas-droite : Détail intervenants (simple)
         inner_det = _make_quad(row2, "Détail intervenants", 1)
         self._frame_detail_container = inner_det
-        self._frame_detail = tk.Frame(inner_det, bg=BG_MAIN)
+        self._frame_detail = tk.Frame(inner_det, bg="#ffffff")
         self._frame_detail.pack(anchor="nw", padx=4, pady=4)
 
 

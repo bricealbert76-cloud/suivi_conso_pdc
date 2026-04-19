@@ -1,0 +1,40 @@
+﻿Intervenant;Mois;PRJ_CodeProjet;NbJours;PRJ_LibelleProjet;Year of charge;PRJ_RespNiv1;Code UT;Type Intervenant
+MARTIN, Jean;janvier;P02508;1300;CPL - Target Architecture;2026;MOREAU, Luc;RGU;CA-CIB
+MARTIN, Jean;février;P02508;650;CPL - Target Architecture;2026;MOREAU, Luc;RGU;CA-CIB
+BENOIT, Lucas;janvier;P04243;10500;Projet Delta;2026;MOREAU, Luc;RGU;CA-CIB
+BENOIT, Lucas;février;P04243;12600;Projet Delta;2026;MOREAU, Luc;RGU;CA-CIB
+BENOIT, Lucas;mars;P04243;14000;Projet Delta;2026;MOREAU, Luc;RGU;CA-CIB
+BENOIT, Lucas;avril;P04243;15400;Projet Delta;2026;MOREAU, Luc;RGU;CA-CIB
+BENOIT, Lucas;mai;P04243;14700;Projet Delta;2026;MOREAU, Luc;RGU;CA-CIB
+BENOIT, Lucas;juin;P04243;14000;Projet Delta;2026;MOREAU, Luc;RGU;CA-CIB
+BENOIT, Lucas;juillet;P04243;15400;Projet Delta;2026;MOREAU, Luc;RGU;CA-CIB
+BENOIT, Lucas;août;P04243;14700;Projet Delta;2026;MOREAU, Luc;RGU;CA-CIB
+BENOIT, Lucas;septembre;P04243;15400;Projet Delta;2026;MOREAU, Luc;RGU;CA-CIB
+BENOIT, Lucas;octobre;P04243;14700;Projet Delta;2026;MOREAU, Luc;RGU;CA-CIB
+BENOIT, Lucas;novembre;P04243;14700;Projet Delta;2026;MOREAU, Luc;RGU;CA-CIB
+BENOIT, Lucas;décembre;P04243;15400;Projet Delta;2026;MOREAU, Luc;RGU;CA-CIB
+GUITTARD, Raphael;janvier;A12345;11700;Projet Alpha;2026;DURAND, Claire;RGU;CA-CIB
+GUITTARD, Raphael;janvier;S99901;1300;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;CA-CIB
+GUITTARD, Raphael;janvier;P02508;650;CPL - Target Architecture;2026;MOREAU, Luc;RGU;CA-CIB
+GUITTARD, Raphael;février;A12345;11700;Projet Alpha;2026;DURAND, Claire;RGU;CA-CIB
+GUITTARD, Raphael;février;S99901;1300;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;CA-CIB
+GUITTARD, Raphael;mars;A12345;12350;Projet Alpha;2026;DURAND, Claire;RGU;CA-CIB
+GUITTARD, Raphael;mars;S99901;650;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;CA-CIB
+GUITTARD, Raphael;avril;A12345;13000;Projet Alpha;2026;DURAND, Claire;RGU;CA-CIB
+GUITTARD, Raphael;avril;S99901;1300;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;CA-CIB
+GUITTARD, Raphael;mai;A12345;12350;Projet Alpha;2026;DURAND, Claire;RGU;CA-CIB
+GUITTARD, Raphael;mai;S99901;1300;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;CA-CIB
+GUITTARD, Raphael;juin;A12345;11700;Projet Alpha;2026;DURAND, Claire;RGU;CA-CIB
+GUITTARD, Raphael;juin;S99901;1300;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;CA-CIB
+ABDELLI, Ahmed;janvier;A12345;14250;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+ABDELLI, Ahmed;janvier;S99901;1500;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;Prestataire
+ABDELLI, Ahmed;février;A12345;13500;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+ABDELLI, Ahmed;février;S99901;1500;Surveillance Comm. A;2026;BLANC, Henri;SurvComm;Prestataire
+ABDELLI, Ahmed;mars;A12345;14250;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+ABDELLI, Ahmed;mars;P02508;750;CPL - Target Architecture;2026;MOREAU, Luc;RGU;Prestataire
+ABDELLI, Ahmed;avril;A12345;15000;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+ABDELLI, Ahmed;avril;P02508;1500;CPL - Target Architecture;2026;MOREAU, Luc;RGU;Prestataire
+ABDELLI, Ahmed;mai;A12345;14250;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+ABDELLI, Ahmed;mai;P02508;1500;CPL - Target Architecture;2026;MOREAU, Luc;RGU;Prestataire
+ABDELLI, Ahmed;juin;A12345;13500;Projet Alpha;2026;DURAND, Claire;RGU;Prestataire
+ABDELLI, Ahmed;juin;P02508;1500;CPL - Target Architecture;2026;MOREAU, Luc;RGU;Prestataire

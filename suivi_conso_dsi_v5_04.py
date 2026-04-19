@@ -88,6 +88,31 @@ IHM de traitement des fichiers de saisie et plans de charges
     - ComboBox UserName : inclut désormais les ressources présentes dans le CSV PDC JH
       filtré mais absentes de intervenants.csv (ajoutées après les intervenants.csv)
 
+  v5.04 : charte CA appliquée à la fenêtre Plan de charges (PdcMajWindow)
+    - Bandeau titre : CA_GREEN pleine largeur, texte blanc (même style fenêtre principale)
+    - En-têtes tableaux C_HDR : "#1e3a5f" (bleu) → CA_GREEN_HOV, texte blanc
+    - Lignes alternées "#1a2530" (bleu sombre) → BG_CARD (neutre thème)
+    - Titres de cadrans et libellés structurels : fg=CA_GREEN
+    - Bouton "Rafraîchir" : style="ca"
+
+  v5.03 : charte couleurs Crédit Agricole sur le bandeau et les boutons principaux
+    - CA_GREEN = "#007461" / CA_GREEN_HOV = "#075144" (couleurs officielles CA)
+    - Bandeau titre pleine largeur fond vert, texte blanc
+    - Boutons "Suivi Conso" et "Générer Histo TJM" : style "ca" (fond CA_GREEN)
+    - Nouveau style "ca" dans make_button (indépendant du thème)
+
+  v5.02 : charte typographique Crédit Agricole sur toute l'IHM
+    - Titres/en-têtes  : Montserrat (remplace Consolas bold)
+    - Corps/libellés   : Open Sans  (remplace Consolas normal)
+    - Logs/tableaux    : Courier New conservé (contenu monospace)
+    - Nouvelles constantes FONT_SMALL_BOLD et FONT_BODY_BOLD
+    - Toutes les polices Consolas en dur remplacées par les constantes
+
+  v5.01 : police Open Sans pour les onglets
+    - FONT_TAB_UNSEL = ("Open Sans", 9) — police CA-CIB pour tous les onglets
+    - Onglet non sélectionné : Open Sans 9, couleur TEXT_SEC
+    - Onglet sélectionné    : Open Sans 9, couleur noire (#000000)
+
   v5.00 : corrections issues de l'audit qualité (3 priorités critiques)
     - FIX 1 — Performance boucle Diana (_process_file1) :
         idx_date_src, idx_value_src, idx_ufirst_src, idx_ulast_src et skip_src
@@ -103,7 +128,7 @@ IHM de traitement des fichiers de saisie et plans de charges
         dans le thread principal via self.after(0, _done).
 """
 
-VERSION = "5.00"
+VERSION = "5.04"
 
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, scrolledtext
@@ -223,6 +248,9 @@ THEMES = {
     },
 }
 
+CA_GREEN     = "#007461"   # vert bouton Crédit Agricole (brand primary)
+CA_GREEN_HOV = "#075144"   # vert hover Crédit Agricole
+
 def _apply_theme(name):
     theme = THEMES.get(name, THEMES["dark"])
     globals().update(theme)
@@ -233,11 +261,14 @@ _parser.add_argument("--style", choices=["dark", "light", "blue"], default="dark
 _args, _ = _parser.parse_known_args()
 _apply_theme(_args.style)
 
-FONT_TITLE = ("Consolas", 18, "bold")
-FONT_HEAD  = ("Consolas", 11, "bold")
-FONT_BODY  = ("Consolas", 10)
-FONT_SMALL = ("Consolas", 9)
-FONT_MONO  = ("Courier New", 9)
+FONT_TITLE     = ("Montserrat", 18, "bold")
+FONT_HEAD      = ("Montserrat", 11, "bold")
+FONT_BODY      = ("Open Sans", 10)
+FONT_BODY_BOLD = ("Open Sans", 10, "bold")
+FONT_SMALL     = ("Open Sans", 9)
+FONT_SMALL_BOLD = ("Open Sans", 9, "bold")
+FONT_MONO      = ("Courier New", 9)
+FONT_TAB_UNSEL = ("Open Sans", 9)
 
 
 def _calc_jours_ouvres(annee):
@@ -381,17 +412,21 @@ def _load_nucleus_exclusions(path):
 
 
 def make_button(parent, text, command, style="neutral", width=None):
-    bg  = BTN_ACT  if style == "action" else BTN_NEU
-    fg  = "#ffffff" if style == "action" else TEXT_PRI
+    if style == "ca":
+        bg, fg, hov = CA_GREEN_HOV, "#ffffff", CA_GREEN
+    elif style == "action":
+        bg, fg, hov = BTN_ACT, "#ffffff", BTN_ACT_H
+    else:
+        bg, fg, hov = BTN_NEU, TEXT_PRI, BTN_NEU_H
     kw  = dict(text=text, command=command, bg=bg, fg=fg,
                font=FONT_HEAD, bd=0, padx=14, pady=8,
-               relief="flat", cursor="hand2", activeforeground="#ffffff")
+               relief="flat", cursor="hand2",
+               activebackground=hov, activeforeground="#ffffff")
     if width:
         kw["width"] = width
     btn = tk.Button(parent, **kw)
-    hov = BTN_ACT_H if style == "action" else BTN_NEU_H
-    btn.bind("<Enter>", lambda e: btn.config(bg=hov))
-    btn.bind("<Leave>", lambda e: btn.config(bg=bg))
+    btn.bind("<Enter>", lambda e, c=hov: btn.config(bg=c))
+    btn.bind("<Leave>", lambda e, c=bg:  btn.config(bg=c))
     return btn
 
 
@@ -445,11 +480,12 @@ class SuiviConsoApp(tk.Tk):
 
     # ── Interface ────────────────────────────────────────────────────────
     def _build_ui(self):
-        hdr = tk.Frame(self, bg=BG_MAIN, pady=16)
-        hdr.pack(fill="x", padx=24)
+        hdr = tk.Frame(self, bg=CA_GREEN, pady=16)
+        hdr.pack(fill="x")
         tk.Label(hdr, text="⬡  SUIVI CONSOMMATION DSI",
-                 bg=BG_MAIN, fg=ACCENT, font=FONT_TITLE).pack(side="left")
-        tk.Label(hdr, text=f"v{VERSION}", bg=BG_MAIN, fg=TEXT_SEC,
+                 bg=CA_GREEN, fg="#ffffff", font=FONT_TITLE,
+                 padx=24).pack(side="left")
+        tk.Label(hdr, text=f"v{VERSION}", bg=CA_GREEN, fg="#ffffff",
                  font=FONT_SMALL).pack(side="left", padx=8, pady=4, anchor="s")
         tk.Frame(self, bg=BORDER, height=1).pack(fill="x")
 
@@ -522,12 +558,12 @@ class SuiviConsoApp(tk.Tk):
 
         self.btn_suivi = make_button(bf, "▶  Suivi Conso",
                                      self._run_suivi_conso,
-                                     style="action", width=22)
+                                     style="ca", width=22)
         self.btn_suivi.pack(fill="x")
 
         self.btn_tjm = make_button(bf, "📊  Générer Histo TJM",
                                    self._run_histo_tjm,
-                                   style="action", width=22)
+                                   style="ca", width=22)
         self.btn_tjm.pack(fill="x", pady=(8, 0))
 
         self.btn_crapull = make_button(bf, "🔍  Vérif. données Crapull",
@@ -559,7 +595,7 @@ class SuiviConsoApp(tk.Tk):
         top = tk.Frame(card, bg=BG_CARD)
         top.pack(fill="x")
         tk.Label(top, text=f" {num} ", bg=ACCENT2, fg="#ffffff",
-                 font=("Consolas", 9, "bold")).pack(side="left", padx=(0, 6))
+                 font=FONT_SMALL_BOLD).pack(side="left", padx=(0, 6))
         tk.Label(top, text=label, bg=BG_CARD, fg=TEXT_PRI,
                  font=FONT_BODY).pack(side="left")
         tk.Label(card, text=hint, bg=BG_CARD, fg=TEXT_SEC,
@@ -582,11 +618,12 @@ class SuiviConsoApp(tk.Tk):
         sty.theme_use("default")
         sty.configure("DSI.TNotebook", background=BG_PANEL, borderwidth=0)
         sty.configure("DSI.TNotebook.Tab", background=BG_ENTRY,
-                      foreground=TEXT_SEC, font=FONT_SMALL,
+                      foreground=TEXT_SEC, font=FONT_TAB_UNSEL,
                       padding=[10, 4], borderwidth=0)
         sty.map("DSI.TNotebook.Tab",
                 background=[("selected", BG_CARD)],
-                foreground=[("selected", TEXT_PRI)])
+                foreground=[("selected", "#000000")],
+                font=[("selected", FONT_TAB_UNSEL)])
 
         nb = ttk.Notebook(parent, style="DSI.TNotebook")
         nb.pack(fill="both", expand=True, padx=10, pady=(0, 10))
@@ -669,7 +706,7 @@ class SuiviConsoApp(tk.Tk):
                               font=FONT_SMALL)
         style_inco.configure("Inco.Treeview.Heading",
                               background=BG_ENTRY, foreground=ACCENT2,
-                              font=("Consolas", 9, "bold"))
+                              font=FONT_SMALL_BOLD)
         self.inco_tree.config(style="Inco.Treeview")
         for col, (head, width) in headers_inco.items():
             self.inco_tree.heading(col, text=head)
@@ -684,7 +721,7 @@ class SuiviConsoApp(tk.Tk):
         self.log_box.tag_config("warn",    foreground=WARN)
         self.log_box.tag_config("error",   foreground="#f85149")
         self.log_box.tag_config("section", foreground=ACCENT2,
-                                font=("Consolas", 10, "bold"))
+                                font=FONT_BODY_BOLD)
 
     # ── Navigateurs fichiers ──────────────────────────────────────────────
     def _preselectfile1(self):
@@ -3010,7 +3047,7 @@ class CrapullWindow(tk.Toplevel):
                          font=FONT_SMALL)
         style.configure("Dark.Treeview.Heading",
                          background=BG_ENTRY, foreground=ACCENT2,
-                         font=("Consolas", 9, "bold"))
+                         font=FONT_SMALL_BOLD)
         style.map("Dark.Treeview",
                   background=[("selected", ACCENT2)],
                   foreground=[("selected", "#000000")])
@@ -3290,7 +3327,7 @@ class DianaWindow(tk.Toplevel):
                          fieldbackground=BG_CARD, rowheight=22, font=FONT_SMALL)
         style.configure("Diana.Treeview.Heading",
                          background=BG_ENTRY, foreground=ACCENT2,
-                         font=("Consolas", 9, "bold"))
+                         font=FONT_SMALL_BOLD)
         style.map("Diana.Treeview",
                   background=[("selected", ACCENT2)],
                   foreground=[("selected", "#000000")])
@@ -3783,28 +3820,28 @@ class PdcMajWindow(tk.Toplevel):
             if has_ecart_fut:
                 ecarts.append((u_orig, ecart_total))
 
-        C_HDR    = "#1e3a5f"
+        C_HDR    = CA_GREEN_HOV
         W_INTERV = 31
         W_ECART  = 10
 
-        tk.Label(self._frame_ecart, text="Intervenant", bg=C_HDR, fg=ACCENT2,
-                 font=("Consolas", 9, "bold"), width=W_INTERV,
+        tk.Label(self._frame_ecart, text="Intervenant", bg=C_HDR, fg="#ffffff",
+                 font=FONT_SMALL_BOLD, width=W_INTERV,
                  anchor="w", relief="flat", bd=1).grid(
             row=0, column=0, sticky="ew", padx=1, pady=1)
-        tk.Label(self._frame_ecart, text="Écart JH", bg=C_HDR, fg=ACCENT2,
-                 font=("Consolas", 9, "bold"), width=W_ECART,
+        tk.Label(self._frame_ecart, text="Écart JH", bg=C_HDR, fg="#ffffff",
+                 font=FONT_SMALL_BOLD, width=W_ECART,
                  anchor="e", relief="flat", bd=1).grid(
             row=0, column=1, sticky="ew", padx=1, pady=1)
 
         self._ecart_usernames = []
         for i, (u_orig, ecart) in enumerate(ecarts, start=1):
-            bg_r  = "#1a2530" if i % 2 == 0 else BG_CARD
+            bg_r  = "#ffffff" if i % 2 == 0 else "#e8eeeb"
             sign  = "+" if ecart > 0 else ""
             e_str = f"{sign}{round(ecart)}"
             fg_e  = WARN if ecart > 0.01 else (ACCENT if ecart < -0.01 else TEXT_PRI)
 
             lbl_n = tk.Label(self._frame_ecart, text=u_orig[:W_INTERV],
-                             bg=bg_r, fg=TEXT_PRI, font=FONT_SMALL,
+                             bg=bg_r, fg="#001a33", font=FONT_SMALL,
                              width=W_INTERV, anchor="w")
             lbl_n.grid(row=i, column=0, sticky="ew", padx=1, pady=1)
             lbl_e = tk.Label(self._frame_ecart, text=e_str,
@@ -3834,27 +3871,27 @@ class PdcMajWindow(tk.Toplevel):
         data  = self._get_jh_data(interv)
         now_m = self._mois_cur
 
-        C_HDR    = "#1e3a5f"
-        C_PAST   = "#2a3a2a"
-        C_PAST_H = "#d4e8c2"
+        C_HDR    = CA_GREEN_HOV
+        C_PAST   = "#c8e6c9"
+        C_PAST_H = "#2e5c2e"
         C_OVER   = "#f0883e"
 
         JOURS_OUVRES = _calc_jours_ouvres(self._annee)
 
-        tk.Label(self._frame_jh, text="Project Code", bg=C_HDR, fg=ACCENT2,
-                 font=("Consolas", 9, "bold"), width=12, anchor="w",
+        tk.Label(self._frame_jh, text="Project Code", bg=C_HDR, fg="#ffffff",
+                 font=FONT_SMALL_BOLD, width=12, anchor="w",
                  relief="flat", bd=1).grid(row=0, column=0, sticky="ew", padx=1, pady=1)
-        tk.Label(self._frame_jh, text="Project Name", bg=C_HDR, fg=ACCENT2,
-                 font=("Consolas", 9, "bold"), width=34, anchor="w",
+        tk.Label(self._frame_jh, text="Project Name", bg=C_HDR, fg="#ffffff",
+                 font=FONT_SMALL_BOLD, width=34, anchor="w",
                  relief="flat", bd=1).grid(row=0, column=1, sticky="ew", padx=1, pady=1)
         for m in range(1, 13):
             bg_h = C_PAST if m < now_m else C_HDR
-            fg_h = C_PAST_H if m < now_m else ACCENT2
+            fg_h = C_PAST_H if m < now_m else "#ffffff"
             tk.Label(self._frame_jh, text=MOIS_ABBREV[m-1], bg=bg_h, fg=fg_h,
-                     font=("Consolas", 9, "bold"), width=6, anchor="center",
+                     font=FONT_SMALL_BOLD, width=6, anchor="center",
                      relief="flat", bd=1).grid(row=0, column=m+1, sticky="ew", padx=1, pady=1)
-        tk.Label(self._frame_jh, text="Total", bg=C_HDR, fg=ACCENT2,
-                 font=("Consolas", 9, "bold"), width=7, anchor="center",
+        tk.Label(self._frame_jh, text="Total", bg=C_HDR, fg="#ffffff",
+                 font=FONT_SMALL_BOLD, width=7, anchor="center",
                  relief="flat", bd=1).grid(row=0, column=14, sticky="ew", padx=1, pady=1)
 
         projs = sorted(data.keys())
@@ -3874,11 +3911,11 @@ class PdcMajWindow(tk.Toplevel):
                     for u_norm, pd2 in self._cache_jh.items():
                         if pc in pd2 and pd2[pc].get("_lib"):
                             lib = pd2[pc]["_lib"]; break
-            bg_r = "#1a2530" if ri % 2 == 0 else BG_CARD
-            tk.Label(self._frame_jh, text=pc, bg=bg_r, fg=TEXT_PRI,
+            bg_r = "#ffffff" if ri % 2 == 0 else "#e8eeeb"
+            tk.Label(self._frame_jh, text=pc, bg=bg_r, fg="#001a33",
                      font=FONT_SMALL, width=12, anchor="w").grid(
                 row=ri, column=0, sticky="ew", padx=1, pady=1)
-            tk.Label(self._frame_jh, text=lib[:40], bg=bg_r, fg=TEXT_SEC,
+            tk.Label(self._frame_jh, text=lib[:40], bg=bg_r, fg="#5a6878",
                      font=FONT_SMALL, width=34, anchor="w").grid(
                 row=ri, column=1, sticky="ew", padx=1, pady=1)
             row_total = 0.0
@@ -3887,7 +3924,7 @@ class PdcMajWindow(tk.Toplevel):
                 row_total += val
                 editable = (m < now_m)
                 bg_c = C_PAST if m < now_m else bg_r
-                fg_c = C_PAST_H if m < now_m else TEXT_PRI
+                fg_c = C_PAST_H if m < now_m else "#001a33"
                 disp = str(int(val)) if val == int(val) else f"{val:.1f}"
                 if editable:
                     var = tk.StringVar(value=disp)
@@ -3909,14 +3946,14 @@ class PdcMajWindow(tk.Toplevel):
                              width=6, anchor="center").grid(
                         row=ri, column=m+1, sticky="ew", padx=1, pady=1)
             tot_disp = str(int(row_total)) if row_total == int(row_total) else f"{row_total:.1f}"
-            tk.Label(self._frame_jh, text=tot_disp, bg=bg_r, fg=ACCENT2,
-                     font=("Consolas", 9, "bold"), width=7, anchor="center").grid(
+            tk.Label(self._frame_jh, text=tot_disp, bg=bg_r, fg=CA_GREEN,
+                     font=FONT_SMALL_BOLD, width=7, anchor="center").grid(
                 row=ri, column=14, sticky="ew", padx=1, pady=1)
 
         n_rows  = len(projs)
         tot_row = n_rows + 1
-        tk.Label(self._frame_jh, text="Total", bg=C_HDR, fg=ACCENT2,
-                 font=("Consolas", 9, "bold"), width=12, anchor="e").grid(
+        tk.Label(self._frame_jh, text="Total", bg=C_HDR, fg="#ffffff",
+                 font=FONT_SMALL_BOLD, width=12, anchor="e").grid(
             row=tot_row, column=0, columnspan=2, sticky="ew", padx=1, pady=1)
         grand_total = 0.0
         for m in range(1, 13):
@@ -3925,15 +3962,15 @@ class PdcMajWindow(tk.Toplevel):
             jo   = JOURS_OUVRES[m-1]
             over = abs(col_tot - jo) > 0.01 and m >= now_m
             bg_t = C_PAST if m < now_m else (C_OVER if over else C_HDR)
-            fg_t = "#1a1a1a" if over else (C_PAST_H if m < now_m else ACCENT2)
+            fg_t = "#1a1a1a" if over else (C_PAST_H if m < now_m else "#ffffff")
             disp = str(int(col_tot)) if col_tot == int(col_tot) else f"{col_tot:.1f}"
             tk.Label(self._frame_jh, text=disp if col_tot else "",
                      bg=bg_t, fg=fg_t,
-                     font=("Consolas", 9, "bold"), width=6, anchor="center").grid(
+                     font=FONT_SMALL_BOLD, width=6, anchor="center").grid(
                 row=tot_row, column=m+1, sticky="ew", padx=1, pady=1)
         gt = str(int(grand_total)) if grand_total == int(grand_total) else f"{grand_total:.1f}"
-        tk.Label(self._frame_jh, text=gt, bg=C_HDR, fg=ACCENT2,
-                 font=("Consolas", 9, "bold"), width=7, anchor="center").grid(
+        tk.Label(self._frame_jh, text=gt, bg=C_HDR, fg="#ffffff",
+                 font=FONT_SMALL_BOLD, width=7, anchor="center").grid(
             row=tot_row, column=14, sticky="ew", padx=1, pady=1)
 
         jo_row = tot_row + 1
@@ -3944,7 +3981,7 @@ class PdcMajWindow(tk.Toplevel):
         for m in range(1, 13):
             jo = JOURS_OUVRES[m-1]
             jo_total += jo
-            bg_j = C_PAST if m < now_m else BG_PANEL
+            bg_j = C_PAST if m < now_m else "#ffffff"
             tk.Label(self._frame_jh, text=str(jo), bg=bg_j, fg=TEXT_SEC,
                      font=FONT_SMALL, width=6, anchor="center").grid(
                 row=jo_row, column=m+1, sticky="ew", padx=1, pady=1)
@@ -3980,7 +4017,7 @@ class PdcMajWindow(tk.Toplevel):
                     if prj not in lib_lookup and isinstance(prj_data, dict):
                         lib_lookup[prj] = prj_data.get("_lib", "")
 
-        C_HDR = "#1e3a5f"
+        C_HDR = CA_GREEN_HOV
         self._eur_row_widgets = {}
 
         cols_hdr = [
@@ -3992,8 +4029,8 @@ class PdcMajWindow(tk.Toplevel):
             ("Budget",          14, "e"),
         ]
         for ci, (txt, w, anc) in enumerate(cols_hdr):
-            tk.Label(self._frame_eur, text=txt, bg=C_HDR, fg=ACCENT2,
-                     font=("Consolas", 9, "bold"), width=w, anchor=anc,
+            tk.Label(self._frame_eur, text=txt, bg=C_HDR, fg="#ffffff",
+                     font=FONT_SMALL_BOLD, width=w, anchor=anc,
                      relief="flat", bd=1).grid(
                 row=0, column=ci, sticky="ew", padx=1, pady=1)
 
@@ -4051,7 +4088,7 @@ class PdcMajWindow(tk.Toplevel):
 
             atterr = round(conso_date + raf, 2)
 
-            bg_r = "#1a2530" if ri % 2 == 0 else BG_CARD
+            bg_r = "#ffffff" if ri % 2 == 0 else "#e8eeeb"
             row_data = [
                 (pc,              12, "w", TEXT_PRI),
                 (lib[:40],        34, "w", TEXT_SEC),
@@ -4158,7 +4195,7 @@ class PdcMajWindow(tk.Toplevel):
         for w in self._frame_detail.winfo_children():
             w.destroy()
 
-        C_HDR = "#1e3a5f"
+        C_HDR = CA_GREEN_HOV
         mois_passes_d = list(range(1, self._mois_cur))
         mois_futurs_d = list(range(self._mois_cur, 13))
 
@@ -4169,8 +4206,8 @@ class PdcMajWindow(tk.Toplevel):
             ("Intervenant",     29), ("Consommé à date", 16),
             ("RAF",             14), ("Atterrissage",    16)
         ]):
-            tk.Label(self._frame_detail, text=txt, bg=C_HDR, fg=ACCENT2,
-                     font=("Consolas", 9, "bold"), width=w,
+            tk.Label(self._frame_detail, text=txt, bg=C_HDR, fg="#ffffff",
+                     font=FONT_SMALL_BOLD, width=w,
                      anchor="w" if ci == 0 else "e",
                      relief="flat", bd=1).grid(
                 row=0, column=ci, sticky="ew", padx=1, pady=1)
@@ -4207,7 +4244,7 @@ class PdcMajWindow(tk.Toplevel):
         tot_cd = tot_raf = 0.0
         for ri, (u_orig, (cd, raf_v)) in enumerate(
                 sorted(detail.items(), key=lambda x: -(x[1][0]+x[1][1])), start=1):
-            bg_r = "#1a2530" if ri % 2 == 0 else BG_CARD
+            bg_r = "#ffffff" if ri % 2 == 0 else "#e8eeeb"
             atterr_v = round(cd + raf_v, 2)
             for ci, (val, w, fg) in enumerate([
                 (u_orig[:29],    29, TEXT_PRI),
@@ -4228,8 +4265,8 @@ class PdcMajWindow(tk.Toplevel):
             ("Total",             29), (_fmt_d(tot_cd),     16),
             (_fmt_d(tot_raf),     14), (_fmt_d(tot_atterr), 16)
         ]):
-            tk.Label(self._frame_detail, text=val, bg=C_HDR, fg=ACCENT2,
-                     font=("Consolas", 9, "bold"), width=w,
+            tk.Label(self._frame_detail, text=val, bg=C_HDR, fg="#ffffff",
+                     font=FONT_SMALL_BOLD, width=w,
                      anchor="e").grid(
                 row=tot_row, column=ci, sticky="ew", padx=1, pady=1)
 
@@ -4260,12 +4297,14 @@ class PdcMajWindow(tk.Toplevel):
             self._status.set(f"⚠  Impossible d'écrire le log : {e}")
 
     def _build_ui(self):
-        hdr = tk.Frame(self, bg=BG_MAIN, pady=8)
-        hdr.pack(fill="x", padx=16)
+        hdr = tk.Frame(self, bg=CA_GREEN, pady=8)
+        hdr.pack(fill="x")
         tk.Label(hdr, text="📝  MISE À JOUR PLAN DE CHARGES",
-                 bg=BG_MAIN, fg=ACCENT2, font=FONT_HEAD).pack(side="left")
+                 bg=CA_GREEN, fg="#ffffff", font=FONT_HEAD,
+                 padx=16).pack(side="left")
         tk.Label(hdr, text=f"Année {self._annee}",
-                 bg=BG_MAIN, fg=TEXT_SEC, font=FONT_SMALL).pack(side="right")
+                 bg=CA_GREEN, fg="#ffffff", font=FONT_SMALL,
+                 padx=16).pack(side="right")
         tk.Frame(self, bg=BORDER, height=1).pack(fill="x")
 
         sel_frame = tk.Frame(self, bg=BG_PANEL, pady=6)
@@ -4278,7 +4317,7 @@ class PdcMajWindow(tk.Toplevel):
         self._cb_interv.pack(side="left")
         self._cb_interv.bind("<<ComboboxSelected>>", self._refresh_tables)
         make_button(sel_frame, "↺  Rafraîchir", self._refresh_tables,
-                    width=14).pack(side="left", padx=12)
+                    style="ca", width=14).pack(side="left", padx=12)
         tk.Checkbutton(
             sel_frame, text="Périmètre Nucleus uniquement",
             variable=self._nucleus_only_var,
@@ -4305,7 +4344,7 @@ class PdcMajWindow(tk.Toplevel):
             outer = tk.Frame(parent, bg=BG_PANEL,
                              highlightbackground=BORDER, highlightthickness=1)
             outer.grid(row=0, column=col, sticky="nsew", padx=4, pady=4)
-            tk.Label(outer, text=title, bg=BG_PANEL, fg=ACCENT2,
+            tk.Label(outer, text=title, bg=BG_PANEL, fg=CA_GREEN,
                      font=FONT_BODY, anchor="w").pack(fill="x", padx=6, pady=(4, 2))
             tk.Frame(outer, bg=BORDER, height=1).pack(fill="x")
             cf = tk.Frame(outer, bg=BG_PANEL)
@@ -4313,12 +4352,12 @@ class PdcMajWindow(tk.Toplevel):
             if vscroll or not autowidth:
                 vsb = tk.Scrollbar(cf, orient="vertical")
                 vsb.pack(side="right", fill="y")
-            c = tk.Canvas(cf, bg=BG_MAIN, bd=0, highlightthickness=0,
+            c = tk.Canvas(cf, bg="#ffffff", bd=0, highlightthickness=0,
                           yscrollcommand=vsb.set if (vscroll or not autowidth) else None)
             if vscroll or not autowidth:
                 vsb.config(command=c.yview)
             c.pack(side="left", fill="both", expand=True)
-            inner = tk.Frame(c, bg=BG_MAIN)
+            inner = tk.Frame(c, bg="#ffffff")
             cw = c.create_window((0, 0), window=inner, anchor="nw")
             if autowidth:
                 inner.bind("<Configure>",
@@ -4360,7 +4399,7 @@ class PdcMajWindow(tk.Toplevel):
         # Cadran bas-droite : Détail intervenants (simple)
         inner_det = _make_quad(row2, "Détail intervenants", 1)
         self._frame_detail_container = inner_det
-        self._frame_detail = tk.Frame(inner_det, bg=BG_MAIN)
+        self._frame_detail = tk.Frame(inner_det, bg="#ffffff")
         self._frame_detail.pack(anchor="nw", padx=4, pady=4)
 
 

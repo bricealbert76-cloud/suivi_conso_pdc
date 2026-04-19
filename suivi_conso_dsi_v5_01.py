@@ -88,6 +88,11 @@ IHM de traitement des fichiers de saisie et plans de charges
     - ComboBox UserName : inclut désormais les ressources présentes dans le CSV PDC JH
       filtré mais absentes de intervenants.csv (ajoutées après les intervenants.csv)
 
+  v5.01 : police Open Sans pour les onglets
+    - FONT_TAB_UNSEL = ("Open Sans", 9) — police CA-CIB pour tous les onglets
+    - Onglet non sélectionné : Open Sans 9, couleur TEXT_SEC
+    - Onglet sélectionné    : Open Sans 9, couleur noire (#000000)
+
   v5.00 : corrections issues de l'audit qualité (3 priorités critiques)
     - FIX 1 — Performance boucle Diana (_process_file1) :
         idx_date_src, idx_value_src, idx_ufirst_src, idx_ulast_src et skip_src
@@ -103,7 +108,7 @@ IHM de traitement des fichiers de saisie et plans de charges
         dans le thread principal via self.after(0, _done).
 """
 
-VERSION = "5.00"
+VERSION = "5.01"
 
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, scrolledtext
@@ -233,11 +238,12 @@ _parser.add_argument("--style", choices=["dark", "light", "blue"], default="dark
 _args, _ = _parser.parse_known_args()
 _apply_theme(_args.style)
 
-FONT_TITLE = ("Consolas", 18, "bold")
-FONT_HEAD  = ("Consolas", 11, "bold")
-FONT_BODY  = ("Consolas", 10)
-FONT_SMALL = ("Consolas", 9)
-FONT_MONO  = ("Courier New", 9)
+FONT_TITLE    = ("Consolas", 18, "bold")
+FONT_HEAD     = ("Consolas", 11, "bold")
+FONT_BODY     = ("Consolas", 10)
+FONT_SMALL    = ("Consolas", 9)
+FONT_MONO     = ("Courier New", 9)
+FONT_TAB_UNSEL = ("Open Sans", 9)
 
 
 def _calc_jours_ouvres(annee):
@@ -582,11 +588,12 @@ class SuiviConsoApp(tk.Tk):
         sty.theme_use("default")
         sty.configure("DSI.TNotebook", background=BG_PANEL, borderwidth=0)
         sty.configure("DSI.TNotebook.Tab", background=BG_ENTRY,
-                      foreground=TEXT_SEC, font=FONT_SMALL,
+                      foreground=TEXT_SEC, font=FONT_TAB_UNSEL,
                       padding=[10, 4], borderwidth=0)
         sty.map("DSI.TNotebook.Tab",
                 background=[("selected", BG_CARD)],
-                foreground=[("selected", TEXT_PRI)])
+                foreground=[("selected", "#000000")],
+                font=[("selected", FONT_TAB_UNSEL)])
 
         nb = ttk.Notebook(parent, style="DSI.TNotebook")
         nb.pack(fill="both", expand=True, padx=10, pady=(0, 10))

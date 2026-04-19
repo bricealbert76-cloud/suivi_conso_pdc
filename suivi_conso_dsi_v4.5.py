@@ -3891,63 +3891,79 @@ class PdcMajWindow(tk.Toplevel):
                  fg=TEXT_SEC, font=FONT_SMALL, anchor="w",
                  padx=12).pack(fill="x", side="bottom")
 
-        # ── Zone principale : grille 2×2 ──────────────────────────────────
+        # ── Zone principale : 2 lignes indépendantes, chacune avec sa répartition ──
         self._selected_proj = None
 
         body = tk.Frame(self, bg=BG_MAIN)
         body.pack(fill="both", expand=True, padx=4, pady=4)
-        body.columnconfigure(0, weight=3)
-        body.columnconfigure(1, weight=2)
+        body.columnconfigure(0, weight=1)
         body.rowconfigure(0, weight=1)
         body.rowconfigure(1, weight=1)
 
-        def _make_quad(title, row, col):
-            """Crée un quadrant avec titre, canvas scrollable et scrollbars."""
-            outer = tk.Frame(body, bg=BG_PANEL,
+        def _make_quad(parent, title, col, autowidth=False):
+            """Crée un quadrant avec titre et canvas.
+            autowidth=True  : largeur suit le contenu, pas de scrollbar (panneau gauche).
+            autowidth=False : s'étend, scrollbar verticale uniquement (panneau droit)."""
+            outer = tk.Frame(parent, bg=BG_PANEL,
                              highlightbackground=BORDER, highlightthickness=1)
-            outer.grid(row=row, column=col, sticky="nsew", padx=4, pady=4)
+            outer.grid(row=0, column=col, sticky="nsew", padx=4, pady=4)
             tk.Label(outer, text=title, bg=BG_PANEL, fg=ACCENT2,
                      font=FONT_BODY, anchor="w").pack(fill="x", padx=6, pady=(4, 2))
             tk.Frame(outer, bg=BORDER, height=1).pack(fill="x")
             cf = tk.Frame(outer, bg=BG_PANEL)
             cf.pack(fill="both", expand=True)
-            vsb = tk.Scrollbar(cf, orient="vertical")
-            hsb = tk.Scrollbar(cf, orient="horizontal")
-            c = tk.Canvas(cf, bg=BG_MAIN, bd=0, highlightthickness=0,
-                          yscrollcommand=vsb.set, xscrollcommand=hsb.set)
-            vsb.config(command=c.yview)
-            hsb.config(command=c.xview)
-            vsb.pack(side="right", fill="y")
-            hsb.pack(side="bottom", fill="x")
-            c.pack(side="left", fill="both", expand=True)
-            inner = tk.Frame(c, bg=BG_MAIN)
-            cw = c.create_window((0, 0), window=inner, anchor="nw")
-            inner.bind("<Configure>",
-                       lambda e, cv=c: cv.configure(scrollregion=cv.bbox("all")))
-            c.bind("<Configure>",
-                   lambda e, cv=c, w=cw: cv.itemconfig(w, width=e.width))
-            c.bind("<Enter>",
-                   lambda e, cv=c: cv.bind_all(
-                       "<MouseWheel>",
-                       lambda ev, cv=cv: cv.yview_scroll(
-                           -1 if ev.delta > 0 else 1, "units")))
-            c.bind("<Leave>",
-                   lambda e, cv=c: cv.unbind_all("<MouseWheel>"))
+            if autowidth:
+                # Pas de scrollbar — largeur et hauteur suivent le contenu
+                c = tk.Canvas(cf, bg=BG_MAIN, bd=0, highlightthickness=0)
+                c.pack(side="left", fill="both", expand=True)
+                inner = tk.Frame(c, bg=BG_MAIN)
+                cw = c.create_window((0, 0), window=inner, anchor="nw")
+                inner.bind("<Configure>",
+                           lambda e, cv=c, w=cw:
+                               cv.config(width=e.width, scrollregion=cv.bbox("all")))
+            else:
+                # Scrollbar verticale uniquement
+                vsb = tk.Scrollbar(cf, orient="vertical")
+                vsb.pack(side="right", fill="y")
+                c = tk.Canvas(cf, bg=BG_MAIN, bd=0, highlightthickness=0,
+                              yscrollcommand=vsb.set)
+                vsb.config(command=c.yview)
+                c.pack(side="left", fill="both", expand=True)
+                inner = tk.Frame(c, bg=BG_MAIN)
+                cw = c.create_window((0, 0), window=inner, anchor="nw")
+                inner.bind("<Configure>",
+                           lambda e, cv=c: cv.configure(scrollregion=cv.bbox("all")))
+                c.bind("<Configure>",
+                       lambda e, cv=c, w=cw: cv.itemconfig(w, width=e.width))
+                c.bind("<Enter>",
+                       lambda e, cv=c: cv.bind_all(
+                           "<MouseWheel>",
+                           lambda ev, cv=cv: cv.yview_scroll(
+                               -1 if ev.delta > 0 else 1, "units")))
+                c.bind("<Leave>",
+                       lambda e, cv=c: cv.unbind_all("<MouseWheel>"))
             return inner
 
-        # Quadrant haut-gauche : Plan de charges JH
-        self._frame_jh = _make_quad(
-            "Plan de charges en JH  (mois passés modifiables)", 0, 0)
+        # Ligne 1 : JH (largeur contenu) | Écarts (espace restant)
+        row1 = tk.Frame(body, bg=BG_MAIN)
+        row1.grid(row=0, column=0, sticky="nsew")
+        row1.rowconfigure(0, weight=1)
+        row1.columnconfigure(0, weight=0)   # suit le contenu
+        row1.columnconfigure(1, weight=1)   # prend l'espace restant
 
-        # Quadrant haut-droite : Écarts JH / JO
-        self._frame_ecart = _make_quad("Écarts JH / JO", 0, 1)
+        self._frame_jh    = _make_quad(row1, "Plan de charges en JH  (mois passés modifiables)", 0, autowidth=True)
+        self._frame_ecart = _make_quad(row1, "Écarts JH / JO", 1)
 
-        # Quadrant bas-gauche : Alimentation en €
+        # Ligne 2 : Atterrissage (largeur contenu) | Détail (espace restant)
+        row2 = tk.Frame(body, bg=BG_MAIN)
+        row2.grid(row=1, column=0, sticky="nsew")
+        row2.rowconfigure(0, weight=1)
+        row2.columnconfigure(0, weight=0)   # suit le contenu
+        row2.columnconfigure(1, weight=1)   # prend l'espace restant
+
         self._frame_eur = _make_quad(
-            "Alimentation en €  —  cliquer sur une ligne pour le détail", 1, 0)
-
-        # Quadrant bas-droite : Détail intervenants
-        inner_det = _make_quad("Détail intervenants", 1, 1)
+            row2, "Alimentation en €  —  cliquer sur une ligne pour le détail", 0, autowidth=True)
+        inner_det = _make_quad(row2, "Détail intervenants", 1)
         self._frame_detail_container = inner_det
         self._frame_detail = tk.Frame(inner_det, bg=BG_MAIN)
         self._frame_detail.pack(anchor="nw", padx=4, pady=4)

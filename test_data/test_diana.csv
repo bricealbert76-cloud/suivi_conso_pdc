@@ -1,0 +1,170 @@
+﻿Project Code;Project Is Alive;WorkPackage Name;Task Name;Organization Unit Name;User First Name;User Last Name;User Country Name;User Contract Type;TimeSheet Mode Name;Timesheet Entry Details Calendar Date;Status;Is Published;Timesheet Entry Details Value;Application Cluster Name;Project Name
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-01-06;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-01-07;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-01-08;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Tests unitaires;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-01-09;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Tests unitaires;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-01-12;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-01-13;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-01-14;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-01-15;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Tests unitaires;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-01-16;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Tests unitaires;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-01-19;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-01-20;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-01-21;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-01-22;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Tests unitaires;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-01-23;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Tests unitaires;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-01-26;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-01-27;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-01-28;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-01-29;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Tests unitaires;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-01-30;Validated;Yes;1.0;Cluster Core;Projet Alpha
+P02508;Yes;WP2 - Architecture;Cadrage technique;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-01-31;Validated;Yes;1.0;Cluster Core;CPL - Target Architecture
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-02-02;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-02-03;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Tests unitaires;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-02-04;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Tests unitaires;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-02-05;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-02-06;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-02-09;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-02-10;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Tests unitaires;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-02-11;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Tests unitaires;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-02-12;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-02-13;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-02-16;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-02-17;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Tests unitaires;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-02-18;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Tests unitaires;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-02-19;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-02-20;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-02-23;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-02-24;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Tests unitaires;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-02-25;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Tests unitaires;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-02-26;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-02-27;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-03-02;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-03-03;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Tests unitaires;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-03-04;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Tests unitaires;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-03-05;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-03-06;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-03-09;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-03-10;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Tests unitaires;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-03-11;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Tests unitaires;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-03-12;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-03-13;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-03-16;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-03-17;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Tests unitaires;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-03-18;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Tests unitaires;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-03-19;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Développement backend;RGU DSI Architecture & Data;Jean;MARTIN;France;CDI;Timesheet;2026-03-20;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-01-06;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-01-07;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-01-08;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-01-09;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-01-12;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Rédaction PV de recette;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-01-13;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Rédaction PV de recette;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-01-14;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-01-15;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-01-16;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Rédaction PV de recette;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-01-19;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-01-20;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-01-21;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-01-22;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-01-23;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Rédaction PV de recette;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-01-26;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Rédaction PV de recette;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-01-27;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-01-28;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-01-29;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-01-30;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-01-31;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-02-02;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-02-03;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Rédaction PV de recette;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-02-04;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-02-05;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-02-06;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-02-09;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-02-10;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-02-11;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-02-12;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Rédaction PV de recette;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-02-13;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Rédaction PV de recette;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-02-16;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-02-17;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-02-18;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-02-19;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-02-20;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-03-02;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-03-03;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-03-04;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-03-05;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Rédaction PV de recette;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-03-06;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Rédaction PV de recette;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-03-09;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-03-10;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-03-11;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-03-12;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-03-13;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+A12345;Yes;WP2 - Recette;Recette fonctionnelle;RGU DSI Distribution;Marie;DUPONT;France;Prestataire;Timesheet;2026-03-16;Validated;Yes;1.0;Cluster Distribution;Projet Alpha
+B11111;Yes;WP1 - Analyse;Analyse fonctionnelle;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-01-06;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Analyse fonctionnelle;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-01-07;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Spécification;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-01-08;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Spécification;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-01-09;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Analyse fonctionnelle;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-01-12;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Analyse fonctionnelle;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-01-13;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Analyse fonctionnelle;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-01-14;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Spécification;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-01-15;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Spécification;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-01-16;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Analyse fonctionnelle;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-01-19;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Analyse fonctionnelle;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-01-20;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Analyse fonctionnelle;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-01-21;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Spécification;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-01-22;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Spécification;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-01-23;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Analyse fonctionnelle;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-01-26;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Analyse fonctionnelle;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-01-27;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Spécification;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-01-28;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Spécification;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-01-29;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Analyse fonctionnelle;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-01-30;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Analyse fonctionnelle;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-01-31;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Analyse fonctionnelle;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-02-02;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Spécification;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-02-03;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Analyse fonctionnelle;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-02-04;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Analyse fonctionnelle;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-02-05;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Analyse fonctionnelle;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-02-06;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Spécification;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-02-09;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Spécification;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-02-10;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Analyse fonctionnelle;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-02-11;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Analyse fonctionnelle;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-02-12;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Analyse fonctionnelle;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-02-13;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Analyse fonctionnelle;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-02-16;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Spécification;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-02-17;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Spécification;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-02-18;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Analyse fonctionnelle;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-02-19;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Analyse fonctionnelle;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-02-20;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Analyse fonctionnelle;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-03-02;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Spécification;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-03-03;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Analyse fonctionnelle;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-03-04;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Spécification;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-03-05;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+B11111;Yes;WP1 - Analyse;Analyse fonctionnelle;RGU DSI Exploration;Thomas;RENARD;France;CDI;Timesheet;2026-03-06;Validated;Yes;1.0;Cluster Exploration;Projet Beta
+S99901;Yes;WP1 - Surveillance;Monitoring;DSI Surveillance Comm.;Emma;LECLERC;France;CDI;Timesheet;2026-01-06;Validated;Yes;1.0;Cluster SurvComm;Surveillance Comm. A
+S99901;Yes;WP1 - Surveillance;Monitoring;DSI Surveillance Comm.;Emma;LECLERC;France;CDI;Timesheet;2026-01-07;Validated;Yes;1.0;Cluster SurvComm;Surveillance Comm. A
+S99901;Yes;WP1 - Surveillance;Monitoring;DSI Surveillance Comm.;Emma;LECLERC;France;CDI;Timesheet;2026-01-08;Validated;Yes;1.0;Cluster SurvComm;Surveillance Comm. A
+S99901;Yes;WP1 - Surveillance;Reporting;DSI Surveillance Comm.;Emma;LECLERC;France;CDI;Timesheet;2026-01-09;Validated;Yes;1.0;Cluster SurvComm;Surveillance Comm. A
+S99901;Yes;WP1 - Surveillance;Monitoring;DSI Surveillance Comm.;Emma;LECLERC;France;CDI;Timesheet;2026-01-12;Validated;Yes;1.0;Cluster SurvComm;Surveillance Comm. A
+S99901;Yes;WP1 - Surveillance;Reporting;DSI Surveillance Comm.;Emma;LECLERC;France;CDI;Timesheet;2026-02-02;Validated;Yes;1.0;Cluster SurvComm;Surveillance Comm. A
+S99901;Yes;WP1 - Surveillance;Monitoring;DSI Surveillance Comm.;Emma;LECLERC;France;CDI;Timesheet;2026-02-03;Validated;Yes;1.0;Cluster SurvComm;Surveillance Comm. A
+S99901;Yes;WP1 - Surveillance;Reporting;DSI Surveillance Comm.;Emma;LECLERC;France;CDI;Timesheet;2026-03-02;Validated;Yes;1.0;Cluster SurvComm;Surveillance Comm. A
+N00001;Yes;WP1 - Modélisation;Modélisation données;DSI Analytics;Paul;BERNARD;France;Prestataire;Timesheet;2026-01-06;Validated;Yes;1.0;Cluster Analytics;Projet Analytics
+N00001;Yes;WP1 - Modélisation;Modélisation données;DSI Analytics;Paul;BERNARD;France;Prestataire;Timesheet;2026-01-07;Validated;Yes;1.0;Cluster Analytics;Projet Analytics
+N00001;Yes;WP1 - Modélisation;Modélisation données;DSI Analytics;Paul;BERNARD;France;Prestataire;Timesheet;2026-01-08;Validated;Yes;1.0;Cluster Analytics;Projet Analytics
+N00001;Yes;WP1 - Modélisation;Dashboard;DSI Analytics;Paul;BERNARD;France;Prestataire;Timesheet;2026-01-09;Validated;Yes;1.0;Cluster Analytics;Projet Analytics
+N00001;Yes;WP1 - Modélisation;Modélisation données;DSI Analytics;Paul;BERNARD;France;Prestataire;Timesheet;2026-02-02;Validated;Yes;1.0;Cluster Analytics;Projet Analytics
+N00001;Yes;WP1 - Modélisation;Dashboard;DSI Analytics;Paul;BERNARD;France;Prestataire;Timesheet;2026-03-02;Validated;Yes;1.0;Cluster Analytics;Projet Analytics
+A12345;Yes;WP1 - Développement;Revue architecture;RGU DSI Architecture & Data;Raphael;GUITTARD;France;CDI;Timesheet;2026-01-06;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Revue architecture;RGU DSI Architecture & Data;Raphael;GUITTARD;France;CDI;Timesheet;2026-01-07;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Revue architecture;RGU DSI Architecture & Data;Raphael;GUITTARD;France;CDI;Timesheet;2026-01-08;Validated;Yes;1.0;Cluster Core;Projet Alpha
+S99901;Yes;WP1 - Surveillance;Comité SurvComm;DSI Surveillance Comm.;Raphael;GUITTARD;France;CDI;Timesheet;2026-01-13;Validated;Yes;0.5;Cluster Core;Surveillance Comm. A
+P02508;Yes;WP2 - Architecture;Gouvernance;RGU DSI Architecture & Data;Raphael;GUITTARD;France;CDI;Timesheet;2026-01-14;Validated;Yes;1.0;Cluster Core;CPL - Target Architecture
+P02508;Yes;WP2 - Architecture;Gouvernance;RGU DSI Architecture & Data;Raphael;GUITTARD;France;CDI;Timesheet;2026-01-15;Validated;Yes;1.0;Cluster Core;CPL - Target Architecture
+A12345;Yes;WP1 - Développement;Revue architecture;RGU DSI Architecture & Data;Raphael;GUITTARD;France;CDI;Timesheet;2026-02-02;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Revue architecture;RGU DSI Architecture & Data;Raphael;GUITTARD;France;CDI;Timesheet;2026-02-03;Validated;Yes;1.0;Cluster Core;Projet Alpha
+P02508;Yes;WP2 - Architecture;Gouvernance;RGU DSI Architecture & Data;Raphael;GUITTARD;France;CDI;Timesheet;2026-02-04;Validated;Yes;1.0;Cluster Core;CPL - Target Architecture
+A12345;Yes;WP1 - Développement;Revue architecture;RGU DSI Architecture & Data;Ahmed;ABDELLI;France;Prestataire;Timesheet;2026-01-06;Validated;Yes;1.0;Cluster Core;Projet Alpha
+A12345;Yes;WP1 - Développement;Revue architecture;RGU DSI Architecture & Data;Ahmed;ABDELLI;France;Prestataire;Timesheet;2026-01-07;Validated;Yes;1.0;Cluster Core;Projet Alpha
+S99901;Yes;WP1 - Surveillance;Comité SurvComm;DSI Surveillance Comm.;Ahmed;ABDELLI;France;Prestataire;Timesheet;2026-01-08;Validated;Yes;0.5;Cluster Core;Surveillance Comm. A
+A12345;Yes;WP1 - Développement;Revue architecture;RGU DSI Architecture & Data;Ahmed;ABDELLI;France;Prestataire;Timesheet;2026-02-02;Validated;Yes;1.0;Cluster Core;Projet Alpha
+P02508;Yes;WP2 - Architecture;Cadrage technique;RGU DSI Architecture & Data;Ahmed;ABDELLI;France;Prestataire;Timesheet;2026-03-02;Validated;Yes;1.0;Cluster Core;CPL - Target Architecture
