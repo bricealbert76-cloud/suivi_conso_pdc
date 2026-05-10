@@ -28,6 +28,20 @@ except ImportError:
 from .constants import *
 from .theme import *
 
+__all__ = [
+    # flags dépendances
+    "HAS_OPENPYXL", "HAS_PANDAS",
+    # fonctions utilitaires
+    "_norm_name", "_mois_effectif", "_calc_jours_ouvres",
+    "_load_allowed_intervenants", "_load_nucleus_exclusions",
+    # constantes nucleus
+    "_NUCLEUS_HARDCODED_SURVCOMM_ORIG", "_NUCLEUS_HARDCODED_SURVCOMM_NORM",
+    "_NUCLEUS_HARDCODED_ANALYTIC_ORIG", "_NUCLEUS_HARDCODED_ANALYTIC_NORM",
+    "_NUCLEUS_HARDCODED_NORM", "_NUCLEUS_ALLOWED_PROJECTS",
+    # widget helper
+    "make_button",
+]
+
 def _mois_effectif():
     """Retourne le mois 'effectif' pour l'application.
     Si on est dans les 3 derniers jours du mois (j >= nb_jours - 3),
