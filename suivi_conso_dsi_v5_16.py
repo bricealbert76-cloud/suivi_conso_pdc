@@ -979,7 +979,7 @@ class SuiviConsoApp(tk.Tk):
         script_dir = os.path.dirname(os.path.abspath(__file__))
         candidate  = os.path.join(script_dir, "intervenants.csv")
         if not os.path.isfile(candidate):
-            self._log("  ⚠  intervenants.csv absent du répertoire script — sélection manuelle.", "warn")
+            self._log(f"  ⚠  intervenants.csv absent du répertoire : {script_dir}", "warn")
             self._log("  ℹ  Le prétraitement sera déclenché après la sélection du fichier 4.", "info")
             return
 
