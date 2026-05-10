@@ -311,7 +311,7 @@ def _apply_theme(name):
 
 import argparse as _argparse
 _parser = _argparse.ArgumentParser(add_help=False)
-_parser.add_argument("--style", choices=["dark", "light", "blue"], default="dark")
+_parser.add_argument("--style", choices=["dark", "light", "blue"], default="light")
 _args, _ = _parser.parse_known_args()
 _apply_theme(_args.style)
 
